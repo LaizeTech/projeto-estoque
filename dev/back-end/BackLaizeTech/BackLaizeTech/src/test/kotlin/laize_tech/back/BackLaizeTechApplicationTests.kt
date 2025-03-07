@@ -1,10 +1,10 @@
-package com.laizetech.laizetech_back
+package laize_tech.back
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class LaizetechBackApplicationTests {
+class BackLaizeTechApplicationTests {
 
 	@Test
 	fun contextLoads() {

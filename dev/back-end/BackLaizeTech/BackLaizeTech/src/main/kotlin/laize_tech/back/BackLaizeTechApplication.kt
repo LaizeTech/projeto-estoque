@@ -1,11 +1,11 @@
-package com.laizetech.laizetech_back
+package laize_tech.back
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class LaizetechBackApplication
+class BackLaizeTechApplication
 
 fun main(args: Array<String>) {
-	runApplication<LaizetechBackApplication>(*args)
+	runApplication<BackLaizeTechApplication>(*args)
 }
