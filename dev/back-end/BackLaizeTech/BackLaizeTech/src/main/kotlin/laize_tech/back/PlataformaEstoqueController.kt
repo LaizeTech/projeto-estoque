@@ -38,7 +38,7 @@ class PlataformaEstoqueController {
     }
     @PostMapping("/{chave}")
     fun addProduto(@RequestBody produto:Produto, @PathVariable chave:Int): ResponseEntity<Produto> {
-        var ax:String = null.toString()
+        var ax:String? = null
         when(chave) {
             1 -> ax = "Shoppe"
             2 -> ax = "Nuvem_shop"
