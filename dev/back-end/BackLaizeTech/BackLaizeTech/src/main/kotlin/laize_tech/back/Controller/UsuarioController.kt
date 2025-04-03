@@ -1,4 +1,4 @@
-package laize_tech.back
+package laize_tech.back.Controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

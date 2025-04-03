@@ -1,4 +1,4 @@
-package laize_tech.back
+package laize_tech.back.Controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -37,7 +37,7 @@ class PlataformaEstoqueController {
         return if (plataforma.isEmpty() or produto.isEmpty()) ResponseEntity.status(404).build() else ResponseEntity.ok(listaEstoque[plataforma]?.find { it.nome == produto })
     }
     @PostMapping("/{chave}")
-    fun addProduto(@RequestBody produto:Produto, @PathVariable chave:Int): ResponseEntity<Produto> {
+    fun addProduto(@RequestBody produto: Produto, @PathVariable chave:Int): ResponseEntity<Produto> {
         var ax:String? = null
         when(chave) {
             1 -> ax = "Shoppe"
@@ -50,7 +50,7 @@ class PlataformaEstoqueController {
         return ResponseEntity.status(200).build()
     }
     @PutMapping("/Atualizar-produto/{plataforma}/{produtoAntigo}")
-    fun updateProduto(@PathVariable plataforma:String, @PathVariable produtoAntigo: String, @RequestBody produtoNovo:Produto): ResponseEntity<String>{
+    fun updateProduto(@PathVariable plataforma:String, @PathVariable produtoAntigo: String, @RequestBody produtoNovo: Produto): ResponseEntity<String>{
         if (plataforma.isEmpty()) return ResponseEntity.status(404).body("Plataforma invalida!")
         if (produtoAntigo.isEmpty()) return ResponseEntity.status(404).body("Produto invalido")
         listaEstoque[plataforma]?.let{
