@@ -1,4 +1,4 @@
-package sptech.projeto05.entity
+package laize_tech.back.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
 @Entity
-data class Empresa(
+public data class Empresa(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

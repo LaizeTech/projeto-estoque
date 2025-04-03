@@ -1,4 +1,4 @@
-package laize_tech.back.Controller
+package laize_tech.back.controller
 
 data class Produto(
     var nome: String? = null,

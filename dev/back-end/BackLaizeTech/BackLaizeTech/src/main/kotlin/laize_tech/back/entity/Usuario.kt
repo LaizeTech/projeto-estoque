@@ -1,4 +1,4 @@
-package sptech.projeto05.entity
+package laize_tech.back.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
