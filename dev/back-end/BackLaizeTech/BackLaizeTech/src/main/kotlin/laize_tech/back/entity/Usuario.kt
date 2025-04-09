@@ -19,5 +19,5 @@ data class Usuario(
     var acessoFinanceiro: Boolean = false,
     @ManyToOne @JoinColumn(name = "fkEmpresa") var empresa: Empresa?
 ) {
-    constructor() : this(null, "", "", "", false, null)
+    constructor(nome: String, email: String, acessoFinanceiro: Boolean) : this(null, nome, email, "", acessoFinanceiro, null)
 }

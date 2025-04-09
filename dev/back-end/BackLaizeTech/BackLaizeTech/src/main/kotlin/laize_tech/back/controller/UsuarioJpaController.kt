@@ -1,25 +1,27 @@
 package laize_tech.back.controller
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import laize_tech.back.repository.UsuarioRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/usarios")
+@RequestMapping("/usuarios")
 class UsuarioJpaController (val repositorio: UsuarioRepository) {
 
     @GetMapping
-    fun get():ResponseEntity<List<Usuario>> {
-        val usuarios = repositorio.findAll()
+    fun get(): ResponseEntity<List<UsuarioDTO>> {
+        val usuarios = repositorio.findUsuarioDTOs()
 
-        return if (usuarios.isEmpty()){
+        return if (usuarios.isEmpty()) {
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(usuarios)
         }
     }
+
 
     @PostMapping ("/adicionar")
     fun post(@RequestBody @Valid novoUsuario: Usuario):
