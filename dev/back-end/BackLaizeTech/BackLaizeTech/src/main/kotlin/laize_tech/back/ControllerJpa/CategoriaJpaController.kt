@@ -1,8 +1,7 @@
-package laize_tech.back.controller
+package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
 import laize_tech.back.entity.Categoria
-import laize_tech.back.entity.Empresa
 import laize_tech.back.repository.CategoriaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

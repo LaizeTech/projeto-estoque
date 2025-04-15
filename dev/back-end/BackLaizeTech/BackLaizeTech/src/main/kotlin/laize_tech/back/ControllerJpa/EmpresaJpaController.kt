@@ -1,4 +1,4 @@
-package laize_tech.back.controller
+package laize_tech.back.ControllerJpa
 
 import laize_tech.back.repository.EmpresaRepository
 import org.springframework.http.ResponseEntity

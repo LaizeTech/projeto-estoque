@@ -14,4 +14,8 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     @Query("SELECT new laize_tech.back.dto.UsuarioDTO(u.nome, u.email, u.acessoFinanceiro) FROM Usuario u")
     fun findUsuarioDTOs(): List<UsuarioDTO>
 
+    @Transactional
+    @Modifying
+    @Query("")
+    fun CriarUsuario();
 }

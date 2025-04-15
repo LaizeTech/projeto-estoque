@@ -1,4 +1,4 @@
-package laize_tech.back.controller
+package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
 import laize_tech.back.dto.UsuarioDTO
@@ -21,7 +21,6 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
             ResponseEntity.status(200).body(usuarios)
         }
     }
-
 
     @PostMapping ("/adicionar")
     fun post(@RequestBody @Valid novoUsuario: Usuario):

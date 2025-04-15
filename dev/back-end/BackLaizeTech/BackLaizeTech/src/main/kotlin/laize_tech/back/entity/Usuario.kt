@@ -14,10 +14,14 @@ data class Usuario(
     var id: Int?,
     @field:NotBlank @field:Size(min = 2, max = 50) var nome: String,
     @field:Email var email: String,
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @field:Size(min = 8, max = 128) var senha: String,
+    @JsonProperty("senha")
+    @field:Size(min = 8, max = 128) var senha: String?,
     var acessoFinanceiro: Boolean = false,
-    @ManyToOne @JoinColumn(name = "fkEmpresa") var empresa: Empresa?
+    //@ManyToOne @JoinColumn(name = "fkEmpresa") var empresa: Empresa?
 ) {
-    constructor(nome: String, email: String, acessoFinanceiro: Boolean) : this(null, nome, email, "", acessoFinanceiro, null)
+    constructor() : this(null, "", "", "", false)
+
+   // override fun toString(): String {
+       // return "Usuario(id=$id, nome='$nome', email='$email', senha='$senha', acessoFinanceiro=$acessoFinanceiro, empresa=$empresa)"
+    //}
 }
