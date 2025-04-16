@@ -13,9 +13,9 @@ data class Usuario(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
     @field:NotBlank @field:Size(min = 2, max = 50) var nome: String,
-    @field:Email var email: String,
+    @field:NotBlank @field:Email var email: String,
     @JsonProperty("senha")
-    @field:Size(min = 8, max = 128) var senha: String?,
+    @field:NotBlank @field:Size(min = 8, max = 10) var senha: String,
     var acessoFinanceiro: Boolean = false,
     //@ManyToOne @JoinColumn(name = "fkEmpresa") var empresa: Empresa?
 ) {

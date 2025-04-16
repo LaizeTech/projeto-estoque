@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import laize_tech.back.repository.UsuarioRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -22,33 +23,42 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
         }
     }
 
-    @PostMapping ("/adicionar")
-    fun post(@RequestBody @Valid novoUsuario: Usuario):
-            ResponseEntity<Usuario> {
+    @PostMapping("/adicionar")
+    fun post(@RequestBody @Valid novoUsuario: Usuario): ResponseEntity<Any> {
+        if (novoUsuario.nome.isBlank() || novoUsuario.senha.isBlank() || novoUsuario.email.isBlank()) {
+            return ResponseEntity.status(400).body("")
+        }
 
-        val usuarios = repositorio.save(novoUsuario)
-        return ResponseEntity.status(201).body(usuarios)
+        if (repositorio.findAll().any { it.email == novoUsuario.email }) {
+            return ResponseEntity.status(409).body("")
+        }
+
+        val usuarioSalvo = repositorio.save(novoUsuario)
+        return ResponseEntity.status(201).body(usuarioSalvo)
     }
 
     @PutMapping("/{id}")
-    fun put (@PathVariable id:Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Usuario>{
-
-        if (!repositorio.existsById(id)){
-            return ResponseEntity.status(404).build()
+    fun put(@PathVariable id: Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Any> {
+        return try {
+            if (!repositorio.existsById(id)) {
+                return ResponseEntity.status(404).body("")
+            }
+            usuarioAtualizado.id = id
+            val usuarioSalvo = repositorio.save(usuarioAtualizado)
+            ResponseEntity.status(200).body(usuarioSalvo)
+        } catch (e: DataIntegrityViolationException) {
+            val mensagemErro = "Erro de integridade: ${e.message}"
+            ResponseEntity.status(400).body(mensagemErro)
         }
-
-        usuarioAtualizado.id = id
-        val usuarios = repositorio.save(usuarioAtualizado)
-        return ResponseEntity.status(200).body(usuarios)
     }
 
     @DeleteMapping ("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
-            return ResponseEntity.status(204).build()
+            return ResponseEntity.status(200).build()
         }
-        val mensagem = "Não foi possível deletar o usuário com id $id"
-        return ResponseEntity.status(404).body(mensagem)
+       
+        return ResponseEntity.status(404).body("")
     }
 }
