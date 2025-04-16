@@ -51,6 +51,10 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- dependencia para a documentação Swagger -->
+		<!-- Link para acessar a documentação Swagger-->
+		<!-- http://localhost:8080/swagger-ui.html -->
+
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -115,5 +119,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
