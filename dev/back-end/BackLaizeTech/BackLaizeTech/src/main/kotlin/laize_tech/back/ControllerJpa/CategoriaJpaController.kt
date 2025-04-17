@@ -21,33 +21,47 @@ class CategoriaJpaController (val repositorio: CategoriaRepository) {
         }
     }
 
-    @PostMapping ("/adicionar")
-    fun post(@RequestBody @Valid novaCategoria: Categoria):
-            ResponseEntity<Categoria> {
+    @PostMapping("/adicionar")
+    fun post(@RequestBody @Valid novaCategoria: Categoria): ResponseEntity<Any> {
 
-        val categoria = repositorio.save(novaCategoria)
-        return ResponseEntity.status(201).body(categoria)
+        if (novaCategoria.nomeCategoria.isBlank()) {
+            return ResponseEntity.status(400).body("")
+        }
+
+        if (repositorio.findAll().any { it.nomeCategoria == novaCategoria.nomeCategoria }) {
+            return ResponseEntity.status(409).body("")
+        }
+
+        val categoriaSalva = repositorio.save(novaCategoria)
+        return ResponseEntity.status(201).body(categoriaSalva)
     }
 
     @PutMapping("/{id}")
-    fun put (@PathVariable id:Int, @RequestBody categoriaAtualizada: Categoria): ResponseEntity<Categoria>{
+    fun put(@PathVariable id: Int, @RequestBody categoriaAtualizada: Categoria): ResponseEntity<Any> {
+        if (!repositorio.existsById(id)) {
+            return ResponseEntity.status(404).body("")
+        }
 
-        if (!repositorio.existsById(id)){
-            return ResponseEntity.status(404).build()
+        if (categoriaAtualizada.nomeCategoria.isBlank()) {
+            return ResponseEntity.status(400).body("")
+        }
+
+        if (repositorio.findAll().any { it.nomeCategoria == categoriaAtualizada.nomeCategoria && it.idCategoria != id }) {
+            return ResponseEntity.status(409).body("")
         }
 
         categoriaAtualizada.idCategoria = id
-        val categoria = repositorio.save(categoriaAtualizada)
-        return ResponseEntity.status(200).body(categoria)
+        val categoriaSalva = repositorio.save(categoriaAtualizada)
+        return ResponseEntity.status(200).body(categoriaSalva)
     }
 
     @DeleteMapping ("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
-            return ResponseEntity.status(204).build()
+            return ResponseEntity.status(200).build()
         }
         val mensagem = "Não foi possível deletar a categoria com id $id"
-        return ResponseEntity.status(404).body(mensagem)
+        return ResponseEntity.status(404).body("")
     }
 }

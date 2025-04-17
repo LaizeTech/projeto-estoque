@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import laize_tech.back.repository.UsuarioRepository
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -39,17 +38,21 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Any> {
-        return try {
-            if (!repositorio.existsById(id)) {
-                return ResponseEntity.status(404).body("")
-            }
-            usuarioAtualizado.id = id
-            val usuarioSalvo = repositorio.save(usuarioAtualizado)
-            ResponseEntity.status(200).body(usuarioSalvo)
-        } catch (e: DataIntegrityViolationException) {
-            val mensagemErro = "Erro de integridade: ${e.message}"
-            ResponseEntity.status(400).body(mensagemErro)
+        if (!repositorio.existsById(id)) {
+            return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
         }
+
+        if (usuarioAtualizado.nome.isBlank() || usuarioAtualizado.senha.isBlank() || usuarioAtualizado.email.isBlank()) {
+            return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
+        }
+
+        if (repositorio.findAll().any { it.email == usuarioAtualizado.email && it.id != id }) {
+            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioAtualizado.email}'.")
+        }
+
+        usuarioAtualizado.id = id
+        val usuarioSalvo = repositorio.save(usuarioAtualizado)
+        return ResponseEntity.status(200).body(usuarioSalvo)
     }
 
     @DeleteMapping ("/{id}")
@@ -58,7 +61,7 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
             repositorio.deleteById(id)
             return ResponseEntity.status(200).build()
         }
-       
+
         return ResponseEntity.status(404).body("")
     }
 }
