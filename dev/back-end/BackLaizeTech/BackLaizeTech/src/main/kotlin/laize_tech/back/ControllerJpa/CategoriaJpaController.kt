@@ -59,7 +59,7 @@ class CategoriaJpaController (val repositorio: CategoriaRepository) {
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
-            return ResponseEntity.status(200).build()
+            return ResponseEntity.status(204).build()
         }
         val mensagem = "Não foi possível deletar a categoria com id $id"
         return ResponseEntity.status(404).body("")

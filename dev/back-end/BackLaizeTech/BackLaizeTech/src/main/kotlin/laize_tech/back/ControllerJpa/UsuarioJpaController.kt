@@ -59,7 +59,7 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
-            return ResponseEntity.status(200).build()
+            return ResponseEntity.status(204).build()
         }
 
         return ResponseEntity.status(404).body("")
