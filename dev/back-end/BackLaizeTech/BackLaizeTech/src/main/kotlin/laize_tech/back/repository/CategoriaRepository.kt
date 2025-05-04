@@ -11,7 +11,18 @@ interface CategoriaRepository : JpaRepository<Categoria, Int> {
 
     @Transactional
     @Modifying
-    @Query("select e from Categoria e") //JPQL --> NÃO é SQL.
-    fun findAllEmpresas(): List<Empresa>
+    @Query("SELECT c FROM Categoria c")
+    fun findAllCategoriasCustom(): List<Categoria>
 
+    //Buscar categorias pelo nome (exato)
+    @Query("SELECT c FROM Categoria c WHERE c.nomeCategoria = :nome")
+    fun findByNomeExato(nome: String): List<Categoria>
+
+    //Buscar categorias com nome contendo texto (como LIKE)
+    @Query("SELECT c FROM Categoria c WHERE LOWER(c.nomeCategoria) LIKE LOWER(CONCAT('%', :fragmento, '%'))")
+    fun findByNomeContendo(fragmento: String): List<Categoria>
+
+    //Contar categorias com determinado nome
+    @Query("SELECT COUNT(c) FROM Categoria c WHERE c.nomeCategoria = :nome")
+    fun countByNome(nome: String): Long
 }
