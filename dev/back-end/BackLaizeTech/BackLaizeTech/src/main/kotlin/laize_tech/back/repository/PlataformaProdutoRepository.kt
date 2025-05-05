@@ -13,4 +13,18 @@ interface PlataformaProdutoRepository : JpaRepository<PlataformaProduto, Int> {
     @Query("select e from PlataformaProduto e") //JPQL --> NÃO é SQL.
     fun findAllPlataformas(): List<PlataformaProduto>
 
+    // Buscar todos os registros de estoque por nome do produto
+    fun findByProdutoNome(nome: String): List<PlataformaProduto>
+
+    // Buscar todos os registros de estoque por nome da plataforma
+    fun findByPlataformaNome(nome: String): List<PlataformaProduto>
+
+    // Buscar todos os registros de estoque por nome da empresa
+    fun findByEmpresaNomeEmpresa(nomeEmpresa: String): List<PlataformaProduto>
+
+    // Buscar um estoque específico por nome da plataforma e nome do produto
+    fun findByPlataformaNomeAndProdutoNome(plataforma: String, produto: String): PlataformaProduto?
+
+    // Buscar todos os estoques por ID da empresa
+    fun findByEmpresaIdEmpresa(id: Int): List<PlataformaProduto>
 }

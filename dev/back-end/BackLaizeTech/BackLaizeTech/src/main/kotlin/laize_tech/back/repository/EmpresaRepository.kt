@@ -12,7 +12,14 @@ interface EmpresaRepository : JpaRepository<Empresa, Int> {
 
     @Transactional
     @Modifying
-    @Query("select e from Empresa e") //JPQL --> NÃO é SQL.
+    @Query("SELECT e FROM Empresa e")
     fun findAllEmpresas(): List<Empresa>
 
+    //Buscar por CNPJ (para evitar duplicidades)
+    @Query("SELECT e FROM Empresa e WHERE e.cnpj = :cnpj")
+    fun findByCnpj(cnpj: String): Empresa?
+
+    //Buscar por nome com like (filtro no front)
+    @Query("SELECT e FROM Empresa e WHERE LOWER(e.nomeEmpresa) LIKE LOWER(CONCAT('%', :nome, '%'))")
+    fun buscarPorNome(nome: String): List<Empresa>
 }

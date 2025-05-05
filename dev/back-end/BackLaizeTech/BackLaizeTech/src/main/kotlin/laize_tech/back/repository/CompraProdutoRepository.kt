@@ -5,6 +5,7 @@ import laize_tech.back.entity.CompraProduto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import java.time.LocalDate
 
 interface CompraProdutoRepository : JpaRepository<CompraProduto, Int> {
 
@@ -13,4 +14,19 @@ interface CompraProdutoRepository : JpaRepository<CompraProduto, Int> {
     @Query("select e from CompraProduto e") //JPQL --> NÃO é SQL.
     fun findAllCompraProdutos(): List<CompraProduto>
 
+    //Buscar compras por intervalo de datas
+    @Query("SELECT c FROM CompraProduto c WHERE c.dtCompraProduto BETWEEN :inicio AND :fim")
+    fun findByPeriodo(inicio: LocalDate, fim: LocalDate): List<CompraProduto>
+
+    //Buscar compras de um determinado produto
+    @Query("SELECT c FROM CompraProduto c WHERE c.produto.idProduto = :idProduto")
+    fun findByProduto(idProduto: Int): List<CompraProduto>
+
+    //Somar valor total gasto em compras de um produto
+    @Query("SELECT SUM(c.precoCompra * c.quantidadeProduto) FROM CompraProduto c WHERE c.produto.idProduto = :idProduto")
+    fun somaTotalPorProduto(idProduto: Int): Double?
+
+    //Agrupar total de compras por data (para gráficos)
+    @Query("SELECT c.dtCompraProduto, SUM(c.precoCompra * c.quantidadeProduto) FROM CompraProduto c GROUP BY c.dtCompraProduto ORDER BY c.dtCompraProduto ASC")
+    fun totalPorData(): List<Array<Any>>
 }
