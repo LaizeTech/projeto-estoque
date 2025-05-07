@@ -14,17 +14,14 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query("select e from Produto e") //JPQL --> NÃO é SQL.
     fun findAllPlataformas(): List<Produto>
 
-    //Buscar todos os produtos de uma determinada categoria
-    @Query("SELECT p FROM Produto p WHERE p.categoria.nomeCategoria = :categoriaNome")
-    fun findByCategoriaNome(categoriaNome: String): List<Produto>
+    // Dynamic Finder: produtos por nome da categoria
+    fun findByCategoria_NomeCategoria(categoriaNome: String): List<Produto>
 
-    //Buscar produtos cadastrados após uma certa data
-    @Query("SELECT p FROM Produto p WHERE p.dataCadastro > :data")
-    fun findProdutosCadastradosDepoisDe(data: LocalDate): List<Produto>
+    // Dynamic Finder: produtos com dataCadastro maior que
+    fun findByDataCadastroAfter(data: LocalDate): List<Produto>
 
-    //Buscar produtos com valor de compra menor que X
-    @Query("SELECT p FROM Produto p WHERE p.precoCompra < :precoMax")
-    fun findByPrecoCompraMenorQue(precoMax: Double): List<Produto>
+    // Dynamic Finder: produtos com preço de compra menor que
+    fun findByPrecoCompraLessThan(precoMax: Double): List<Produto>
 
     //Contar produtos de uma categoria específica
     @Query("SELECT COUNT(p) FROM Produto p WHERE p.categoria.nomeCategoria = :categoriaNome")

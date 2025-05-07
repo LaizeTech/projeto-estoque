@@ -14,23 +14,19 @@ interface VendasRepository : JpaRepository<Vendas, Int> {
     @Query("select e from Vendas e")
     fun findAllVendas(): List<Vendas>
 
-    //Buscar todas as vendas concluídas
-    @Query("SELECT v FROM Vendas v WHERE v.statusVendas = true")
-    fun findVendasConcluidas(): List<Vendas>
+    // Dynamic Finder: vendas concluídas
+    fun findByStatusVendasTrue(): List<Vendas>
 
-    //Buscar vendas por intervalo de datas
-    @Query("SELECT v FROM Vendas v WHERE v.dtVenda BETWEEN :dataInicio AND :dataFim")
-    fun findVendasPorPeriodo(dataInicio: LocalDate, dataFim: LocalDate): List<Vendas>
+    // Dynamic Finder: intervalo de datas
+    fun findByDtVendaBetween(dataInicio: LocalDate, dataFim: LocalDate): List<Vendas>
 
     //Somar valor total das vendas em um período
     @Query("SELECT SUM(v.precoVenda) FROM Vendas v WHERE v.dtVenda BETWEEN :dataInicio AND :dataFim")
     fun somaPrecoVendasPorPeriodo(dataInicio: LocalDate, dataFim: LocalDate): Double?
 
-    //Buscar vendas por plataforma específica
-    @Query("SELECT v FROM Vendas v WHERE v.plataforma.idPlataforma = :idPlataforma")
-    fun findByPlataforma(idPlataforma: Int): List<Vendas>
+    // Dynamic Finder: por plataforma
+    fun findByPlataformaIdPlataforma(idPlataforma: Int): List<Vendas>
 
-    //Buscar vendas por empresa específica
-    @Query("SELECT v FROM Vendas v WHERE v.empresa.idEmpresa = :idEmpresa")
-    fun findByEmpresa(idEmpresa: Int): List<Vendas>
+    // Dynamic Finder: por empresa
+    fun findByEmpresaIdEmpresa(idEmpresa: Int): List<Vendas>
 }

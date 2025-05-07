@@ -14,13 +14,11 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     @Query("SELECT new laize_tech.back.dto.UsuarioDTO(u.nome, u.email, u.acessoFinanceiro) FROM Usuario u")
     fun findUsuarioDTOs(): List<UsuarioDTO>
 
-    //Buscar usuários com acesso financeiro
-    @Query("SELECT u FROM Usuario u WHERE u.acessoFinanceiro = true")
-    fun findUsuariosComAcessoFinanceiro(): List<Usuario>
+    // Dynamic Finder: usuários com acesso financeiro
+    fun findByAcessoFinanceiroTrue(): List<Usuario>
 
-    //Buscar usuários por parte do nome (como um LIKE)
-    @Query("SELECT u FROM Usuario u WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :nomeFragmento, '%'))")
-    fun findByNomeContendo(nomeFragmento: String): List<Usuario>
+    // Dynamic Finder: nome contém (like)
+    fun findByNomeContainingIgnoreCase(nomeFragmento: String): List<Usuario>
 
     //Contar quantos usuários têm acesso financeiro
     @Query("SELECT COUNT(u) FROM Usuario u WHERE u.acessoFinanceiro = true")

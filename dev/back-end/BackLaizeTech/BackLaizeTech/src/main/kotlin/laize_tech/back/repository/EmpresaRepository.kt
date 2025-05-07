@@ -16,10 +16,8 @@ interface EmpresaRepository : JpaRepository<Empresa, Int> {
     fun findAllEmpresas(): List<Empresa>
 
     //Buscar por CNPJ (para evitar duplicidades)
-    @Query("SELECT e FROM Empresa e WHERE e.cnpj = :cnpj")
-    fun findByCnpj(cnpj: String): Empresa?
+    fun findByCnpj(cnpj: String): Empresa
 
     //Buscar por nome com like (filtro no front)
-    @Query("SELECT e FROM Empresa e WHERE LOWER(e.nomeEmpresa) LIKE LOWER(CONCAT('%', :nome, '%'))")
-    fun buscarPorNome(nome: String): List<Empresa>
+    fun findByNomeEmpresaContainingIgnoreCase(nome: String): List<Empresa>
 }

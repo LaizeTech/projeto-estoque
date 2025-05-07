@@ -15,14 +15,11 @@ interface CategoriaRepository : JpaRepository<Categoria, Int> {
     fun findAllCategoriasCustom(): List<Categoria>
 
     //Buscar categorias pelo nome (exato)
-    @Query("SELECT c FROM Categoria c WHERE c.nomeCategoria = :nome")
-    fun findByNomeExato(nome: String): List<Categoria>
+    fun findByNomeCategoria(nome: String): List<Categoria>
 
     //Buscar categorias com nome contendo texto (como LIKE)
-    @Query("SELECT c FROM Categoria c WHERE LOWER(c.nomeCategoria) LIKE LOWER(CONCAT('%', :fragmento, '%'))")
-    fun findByNomeContendo(fragmento: String): List<Categoria>
+    fun findByNomeCategoriaContainingIgnoreCase(fragmento: String): List<Categoria>
 
     //Contar categorias com determinado nome
-    @Query("SELECT COUNT(c) FROM Categoria c WHERE c.nomeCategoria = :nome")
-    fun countByNome(nome: String): Long
+    fun countByNomeCategoria(nome: String): Long
 }
