@@ -6,7 +6,7 @@ data class Usuario(
     var telefone: String? = null,
     //true significa que tem acesso ao gerenciamento financeiro
     var acesso_financeiro: Boolean = true,
-    private var senha: String
+    var senha: String
 ){
 
 }

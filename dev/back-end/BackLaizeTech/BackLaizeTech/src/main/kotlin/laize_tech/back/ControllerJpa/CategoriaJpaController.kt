@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/categorias")
-class CategoriaJpaController(val repositorio: CategoriaRepository) {
+class  CategoriaJpaController (val repositorio: CategoriaRepository) {
 
     @GetMapping
-    fun get(): ResponseEntity<List<Categoria>> {
+    fun get():ResponseEntity<List<Categoria>> {
         val categorias = repositorio.findAll()
 
-        return if (categorias.isEmpty()) {
+        return if (categorias.isEmpty()){
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(categorias)
@@ -28,7 +28,7 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
             return ResponseEntity.status(400).body("")
         }
 
-        if (repositorio.countByNomeCategoria(novaCategoria.nomeCategoria) > 0) {
+        if (repositorio.findAll().any { it.nomeCategoria == novaCategoria.nomeCategoria }) {
             return ResponseEntity.status(409).body("")
         }
 
@@ -46,7 +46,7 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
             return ResponseEntity.status(400).body("")
         }
 
-        if (repositorio.existsByNomeCategoriaAndIdCategoriaNot(categoriaAtualizada.nomeCategoria, id)) {
+        if (repositorio.findAll().any { it.nomeCategoria == categoriaAtualizada.nomeCategoria && it.idCategoria != id }) {
             return ResponseEntity.status(409).body("")
         }
 
@@ -55,12 +55,13 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
         return ResponseEntity.status(200).body(categoriaSalva)
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping ("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
             return ResponseEntity.status(204).build()
         }
+        val mensagem = "Não foi possível deletar a categoria com id $id"
         return ResponseEntity.status(404).body("")
     }
 }

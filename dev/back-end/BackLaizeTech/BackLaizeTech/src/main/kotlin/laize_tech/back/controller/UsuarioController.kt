@@ -1,11 +1,14 @@
 package laize_tech.back.controller
 
+import laize_tech.back.dto.LoginDTO
+import laize_tech.back.service.JwtUtil
+import laize_tech.back.service.UsuarioService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/usuario")
-class UsuarioController {
+class UsuarioController(val usuarioService: UsuarioService) {
 
     val lista_usuario = mutableListOf<Usuario>(
         Usuario("Ayrton Casa", "ayrton.casa@sptech.school", "111111", false, "3045u89"),
@@ -14,60 +17,71 @@ class UsuarioController {
 
     @GetMapping("/listar")
     fun listarUsuarios(): ResponseEntity<List<Usuario>> {
-
-        if(lista_usuario.isEmpty()){
-            return ResponseEntity.status(204).build()
-        }else{
-            return ResponseEntity.status(200).body(lista_usuario)
+        return if (lista_usuario.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(lista_usuario)
         }
-
     }
 
     @GetMapping("/listar/{id}")
     fun listarUsuariosID(@PathVariable id: Int): ResponseEntity<Usuario> {
-        if(id in 0..lista_usuario.size - 1){
-            return ResponseEntity.status(200).body(lista_usuario[id])
-        }else{
-            return ResponseEntity.status(404).build()
+        return if (id in 0..lista_usuario.size - 1) {
+            ResponseEntity.status(200).body(lista_usuario[id])
+        } else {
+            ResponseEntity.status(404).build()
         }
     }
 
     @PostMapping
-    fun criarUsuario(@RequestBody novoUsuario: Usuario): ResponseEntity<Usuario>{
+    fun criarUsuario(@RequestBody novoUsuario: Usuario): ResponseEntity<Usuario> {
         lista_usuario.add(novoUsuario)
         return ResponseEntity.status(201).body(novoUsuario)
     }
 
     @DeleteMapping("/deletar/{id}")
-    fun deletarUsuario(@PathVariable id: Int): ResponseEntity<Usuario>{
-        if (id in 0..lista_usuario.size - 1){
+    fun deletarUsuario(@PathVariable id: Int): ResponseEntity<Usuario> {
+        return if (id in 0..lista_usuario.size - 1) {
             lista_usuario.removeAt(id)
-            return ResponseEntity.status(200).build()
-        }else{
-            return ResponseEntity.status(400).build()
+            ResponseEntity.status(200).build()
+        } else {
+            ResponseEntity.status(400).build()
         }
     }
 
     @PutMapping("/atualizar/{id}")
     fun atualizarUsuario(@PathVariable id: Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Usuario> {
-        if (id in 0..lista_usuario.size - 1) {
+        return if (id in 0..lista_usuario.size - 1) {
             lista_usuario[id] = usuarioAtualizado
-            return ResponseEntity.status(200).body(usuarioAtualizado)
+            ResponseEntity.status(200).body(usuarioAtualizado)
         } else {
-            return ResponseEntity.status(400).build()
+            ResponseEntity.status(400).build()
         }
     }
 
     @PatchMapping("/atualizar-telefone/{id}/{novoTelefone}")
-    fun atualizarCampoUsuario(@PathVariable id: Int, @PathVariable novoTelefone: String): ResponseEntity<Usuario>{
-        if (id in 0..lista_usuario.size - 1){
+    fun atualizarCampoUsuario(@PathVariable id: Int, @PathVariable novoTelefone: String): ResponseEntity<Usuario> {
+        return if (id in 0..lista_usuario.size - 1) {
             lista_usuario[id].telefone = novoTelefone
-            return ResponseEntity.status(200).body(lista_usuario[id])
-        }else{
-            return ResponseEntity.status(400).build()
+            ResponseEntity.status(200).body(lista_usuario[id])
+        } else {
+            ResponseEntity.status(400).build()
         }
     }
 
+    @PostMapping("/login")
+    fun login(@RequestBody loginDTO: LoginDTO): ResponseEntity<String> {
+        var token = usuarioService.login(loginDTO.email, loginDTO.senha)
+        var acesso = JwtUtil().chave
+
+        return if (token != null) {
+            acesso = token
+            print("token atualizado")
+            println(acesso.toString())
+            ResponseEntity.ok(token)
+
+        } else {
+            ResponseEntity.status(401).body("Credenciais inválidas") // Retorna 401 em caso de falha
+        }
     }
-
-
+}
