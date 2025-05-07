@@ -22,4 +22,7 @@ interface CategoriaRepository : JpaRepository<Categoria, Int> {
 
     //Contar categorias com determinado nome
     fun countByNomeCategoria(nome: String): Long
+
+    //Verifica se existe uma categoria com o nome especificado (nome)
+    fun existsByNomeCategoriaAndIdCategoriaNot(nome: String, id: Int): Boolean
 }

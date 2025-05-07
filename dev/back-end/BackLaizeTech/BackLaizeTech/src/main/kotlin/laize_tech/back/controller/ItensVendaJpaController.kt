@@ -21,18 +21,68 @@ class ItensVendaJpaController (val repositorio: ItensVendaRepository) {
         }
     }
 
+    @GetMapping("/por-venda/{idVenda}")
+    fun getByVenda(@PathVariable idVenda: Int): ResponseEntity<List<ItensVenda>> {
+        val itens = repositorio.findByVenda_IdVendas(idVenda)
+
+        return if (itens.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(itens)
+        }
+    }
+
+    @GetMapping("/por-produto/{idProduto}")
+    fun getByProduto(@PathVariable idProduto: Int): ResponseEntity<List<ItensVenda>> {
+        val itens = repositorio.findByProduto_IdProduto(idProduto)
+
+        return if (itens.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(itens)
+        }
+    }
+
+    @GetMapping("/por-empresa/{idEmpresa}")
+    fun getByEmpresa(@PathVariable idEmpresa: Int): ResponseEntity<List<ItensVenda>> {
+        val itens = repositorio.findByEmpresa_IdEmpresa(idEmpresa)
+
+        return if (itens.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(itens)
+        }
+    }
+
+    @GetMapping("/por-plataforma/{idPlataforma}")
+    fun getByPlataforma(@PathVariable idPlataforma: Int): ResponseEntity<List<ItensVenda>> {
+        val itens = repositorio.findByPlataforma_IdPlataforma(idPlataforma)
+
+        return if (itens.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(itens)
+        }
+    }
+
+    @GetMapping("/subtotal/{idVenda}")
+    fun getSubTotalPorVenda(@PathVariable idVenda: Int): ResponseEntity<Double?> {
+        val subtotal = repositorio.somaSubTotalPorVenda(idVenda)
+        return if (subtotal == null) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(subtotal)
+        }
+    }
 
     @PostMapping("/adicionar")
-    fun post(@RequestBody @Valid novoItem: ItensVenda):
-            ResponseEntity<ItensVenda> {
-
+    fun post(@RequestBody @Valid novoItem: ItensVenda): ResponseEntity<ItensVenda> {
         val itens = repositorio.save(novoItem)
         return ResponseEntity.status(201).body(itens)
     }
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody itemAtualizado: ItensVenda): ResponseEntity<ItensVenda> {
-
         if (!repositorio.existsById(id)) {
             return ResponseEntity.status(404).build()
         }

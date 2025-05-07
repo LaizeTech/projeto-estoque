@@ -9,12 +9,11 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/usuarios")
-class UsuarioJpaController (val repositorio: UsuarioRepository) {
+class UsuarioJpaController(val repositorio: UsuarioRepository) {
 
     @GetMapping
     fun get(): ResponseEntity<List<UsuarioDTO>> {
         val usuarios = repositorio.findUsuarioDTOs()
-
         return if (usuarios.isEmpty()) {
             ResponseEntity.status(204).build()
         } else {
@@ -22,14 +21,46 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
         }
     }
 
+    @GetMapping("/por-nome")
+    fun getByNome(@RequestParam nomeFragmento: String): ResponseEntity<List<UsuarioDTO>> {
+        val usuarios = repositorio.findByNomeContainingIgnoreCase(nomeFragmento)
+        return if (usuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            val usuariosDTO = usuarios.map { UsuarioDTO(it.nome, it.email, it.acessoFinanceiro) }
+            ResponseEntity.status(200).body(usuariosDTO)
+        }
+    }
+
+    @GetMapping("/com-acesso-financeiro")
+    fun getUsuariosComAcessoFinanceiro(): ResponseEntity<List<UsuarioDTO>> {
+        val usuarios = repositorio.findByAcessoFinanceiroTrue()
+        return if (usuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            val usuariosDTO = usuarios.map { UsuarioDTO(it.nome, it.email, it.acessoFinanceiro) }
+            ResponseEntity.status(200).body(usuariosDTO)
+        }
+    }
+
+    @GetMapping("/por-email")
+    fun getByEmail(@RequestParam email: String): ResponseEntity<UsuarioDTO> {
+        val usuarioDTO = repositorio.findUsuarioDTOByEmail(email)
+        return if (usuarioDTO == null) {
+            ResponseEntity.status(404).body(usuarioDTO)
+        } else {
+            ResponseEntity.status(200).body(usuarioDTO)
+        }
+    }
+
     @PostMapping("/adicionar")
     fun post(@RequestBody @Valid novoUsuario: Usuario): ResponseEntity<Any> {
         if (novoUsuario.nome.isBlank() || novoUsuario.senha.isBlank() || novoUsuario.email.isBlank()) {
-            return ResponseEntity.status(400).body("")
+            return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
         }
 
         if (repositorio.findAll().any { it.email == novoUsuario.email }) {
-            return ResponseEntity.status(409).body("")
+            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com esse e-mail!")
         }
 
         val usuarioSalvo = repositorio.save(novoUsuario)
@@ -55,13 +86,13 @@ class UsuarioJpaController (val repositorio: UsuarioRepository) {
         return ResponseEntity.status(200).body(usuarioSalvo)
     }
 
-    @DeleteMapping ("/{id}")
+    @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
             return ResponseEntity.status(204).build()
         }
 
-        return ResponseEntity.status(404).body("")
+        return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
     }
 }
