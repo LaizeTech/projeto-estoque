@@ -13,10 +13,18 @@ data class Produto(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var idProduto: Int?,
-    @field:NotBlank @field:Size(min = 2, max = 120) var nomeProduto: String,
+
+    @field:NotBlank
+    @field:Size(min = 2, max = 120)
+    var nomeProduto: String,
+
     var precoCompra: Double,
+
     var dataCadastro: LocalDate = LocalDate.now(),
-    @ManyToOne @JoinColumn(name = "fkCategoria") var categoria: Categoria?
+
+    @ManyToOne
+    @JoinColumn(name = "fkCategoria")
+    var categoria: Categoria?
 ) {
     constructor() : this(null, "", 0.0, LocalDate.now(), null)
 }
