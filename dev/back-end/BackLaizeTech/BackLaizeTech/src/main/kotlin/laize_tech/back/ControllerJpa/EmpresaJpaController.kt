@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 import laize_tech.back.entity.Empresa
 
 @RestController
-@RequestMapping("/empresas")
+    @RequestMapping("/empresas")
 class EmpresaJpaController(val repositorio: EmpresaRepository) {
 
     @GetMapping

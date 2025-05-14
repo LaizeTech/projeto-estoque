@@ -1,5 +1,6 @@
-package laize_tech.back.controller
+package laize_tech.back.ControllerJpa
 
+import laize_tech.back.controller.Produto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping

@@ -1,4 +1,4 @@
-package laize_tech.back.controller
+package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
 import laize_tech.back.entity.Vendas
