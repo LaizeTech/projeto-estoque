@@ -15,7 +15,7 @@ interface CompraProdutoRepository : JpaRepository<CompraProduto, Int> {
     fun findAllCompraProdutos(): List<CompraProduto>
 
     //Buscar compras por intervalo de datas
-    fun findByDtCompraProdutoBetween(inicio: LocalDate, fim: LocalDate): List<CompraProduto>
+    fun findByDtCompraBetween(inicio: LocalDate, fim: LocalDate): List<CompraProduto>
 
     //Buscar compras de um determinado produto
     fun findByProdutoIdProduto(idProduto: Int): List<CompraProduto>
@@ -25,6 +25,6 @@ interface CompraProdutoRepository : JpaRepository<CompraProduto, Int> {
     fun somaTotalPorProduto(idProduto: Int): Double?
 
     //Agrupar total de compras por data (para gráficos)
-    @Query("SELECT c.dtCompraProduto, SUM(c.precoCompra * c.quantidadeProduto) FROM CompraProduto c GROUP BY c.dtCompraProduto ORDER BY c.dtCompraProduto ASC")
+    @Query("SELECT c.dtCompra, SUM(c.precoCompra * c.quantidadeProduto) FROM CompraProduto c GROUP BY c.dtCompra ORDER BY c.dtCompra ASC")
     fun totalPorData(): List<Array<Any>>
 }

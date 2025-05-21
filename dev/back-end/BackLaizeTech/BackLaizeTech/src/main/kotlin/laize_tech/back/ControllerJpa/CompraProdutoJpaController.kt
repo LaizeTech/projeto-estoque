@@ -25,7 +25,7 @@ class CompraProdutoJpaController (val repositorio: CompraProdutoRepository) {
     fun getByData(@RequestParam inicio: String, @RequestParam fim: String): ResponseEntity<List<CompraProduto>> {
         val inicioDate = LocalDate.parse(inicio)
         val fimDate = LocalDate.parse(fim)
-        val compras = repositorio.findByDtCompraProdutoBetween(inicioDate, fimDate)
+        val compras = repositorio.findByDtCompraBetween(inicioDate, fimDate)
 
         return if (compras.isEmpty()) {
             ResponseEntity.status(204).build()

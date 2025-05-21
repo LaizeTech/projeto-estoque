@@ -1,19 +1,24 @@
 package laize_tech.back.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 
 @Entity
-data class Plataforma(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+@Table(name = "Plataforma")
+class Plataforma(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idPlataforma:Int?,
-    @field:NotBlank @field:Size(min = 2, max = 20) var nomePlataforma: String,
-    var status: Boolean = false,
-    @ManyToOne @JoinColumn(name = "fkEmpresa") var empresa: Empresa?
+    @Column(name = "idPlataforma")
+    var idPlataforma: Long? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "fkEmpresa")
+    var empresa: Empresa? = null,
+
+    var nomePlataforma: String? = null,
+
+    var status: Boolean? = null
+
 ) {
-    constructor() : this(null, "", false, null)
+    constructor() : this(null, null, null, null)
 }

@@ -77,11 +77,11 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
             return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
         }
 
-        if (repositorio.findAll().any { it.email == usuarioAtualizado.email && it.id != id }) {
+        if (repositorio.findAll().any { it.email == usuarioAtualizado.email && it.idUsuario != id.toLong() }) {
             return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioAtualizado.email}'.")
         }
 
-        usuarioAtualizado.id = id
+        usuarioAtualizado.idUsuario = id.toLong()
         val usuarioSalvo = repositorio.save(usuarioAtualizado)
         return ResponseEntity.status(200).body(usuarioSalvo)
     }

@@ -45,11 +45,18 @@
 		</dependency>
 
 		<!-- dependencia para banco de dados h2 -->
+<!--		<dependency>-->
+<!--			<groupId>com.h2database</groupId>-->
+<!--			<artifactId>h2</artifactId>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
+
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>8.0.33</version> <!-- Substitua pela versão mais recente disponível -->
 		</dependency>
+
 
 		<!-- dependencia para a documentação Swagger -->
 		<!-- Link para acessar a documentação Swagger-->

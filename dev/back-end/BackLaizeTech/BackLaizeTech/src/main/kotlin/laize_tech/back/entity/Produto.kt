@@ -1,30 +1,25 @@
 package laize_tech.back.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
-import laize_tech.back.entity.Categoria
-import java.time.LocalDate
+import java.util.*
 
 @Entity
 data class Produto(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idProduto: Int?,
-
-    @field:NotBlank
-    @field:Size(min = 2, max = 120)
-    var nomeProduto: String,
-
-    var precoCompra: Double,
-
-    var dataCadastro: LocalDate = LocalDate.now(),
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val idProduto: Long,
 
     @ManyToOne
     @JoinColumn(name = "fkCategoria")
-    var categoria: Categoria?
+    val categoria: Categoria,
+
+    val nomeProduto: String,
+    val dtRegistro: Date,
+    val quantidadeProduto: Int,
+    val statusAtivo: Boolean
 ) {
-    constructor() : this(null, "", 0.0, LocalDate.now(), null)
+    constructor() : this(0, Categoria(), "", Date(), 0, true)
+
+    override fun toString(): String {
+        return "Produto(idProduto=$idProduto, categoria=${categoria.nomeCategoria}, nomeProduto='$nomeProduto', dtRegistro=$dtRegistro, quantidadeProduto=$quantidadeProduto, statusAtivo=$statusAtivo)"
+    }
 }

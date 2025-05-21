@@ -14,4 +14,6 @@ data class TipoSaida(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var idTipoSaida: Int? = null,
     @field:NotBlank @field:Size(min = 2, max = 120) var nomeTipo: String,
-)
+) {
+    constructor() : this(null, "")
+}
