@@ -17,9 +17,6 @@ interface PlataformaProdutoRepository : JpaRepository<PlataformaProduto, Int> {
 
     fun findByPlataformaNomePlataforma(nome: String): List<PlataformaProduto>
 
-    fun findByEmpresaNomeEmpresa(nomeEmpresa: String): List<PlataformaProduto>
-
     fun findByPlataformaNomePlataformaAndProdutoNomeProduto(plataforma: String, produto: String): PlataformaProduto?
 
-    fun findByEmpresaIdEmpresa(id: Int): List<PlataformaProduto>
 }

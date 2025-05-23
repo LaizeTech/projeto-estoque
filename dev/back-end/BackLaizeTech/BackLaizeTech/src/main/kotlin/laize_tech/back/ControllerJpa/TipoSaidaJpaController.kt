@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/tipos-saida")
+@RequestMapping("/tipos-saidas")
 class TipoSaidaJpaController(val repositorio: TipoSaidaRepository) {
 
     @GetMapping

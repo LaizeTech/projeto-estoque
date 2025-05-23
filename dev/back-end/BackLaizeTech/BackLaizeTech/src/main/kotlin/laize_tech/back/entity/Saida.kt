@@ -5,24 +5,22 @@ import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
-@Table(name = "Saida")
-class Saida(
-
+data class Saida(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idSaida")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idSaida: Int? = null,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkTipoSaida")
     var tipoSaida: TipoSaida? = null,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkEmpresa")
     var empresa: Empresa? = null,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkPlataforma")
     var plataforma: Plataforma? = null,
 
@@ -34,7 +32,7 @@ class Saida(
 
     var totalDesconto: Double? = null,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkStatusVenda")
     var statusVenda: StatusVenda? = null
 

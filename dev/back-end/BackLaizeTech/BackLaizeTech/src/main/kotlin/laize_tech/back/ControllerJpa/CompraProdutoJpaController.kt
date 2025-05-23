@@ -1,43 +1,25 @@
 package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.CompraProdutoDTO
 import laize_tech.back.entity.CompraProduto
+import laize_tech.back.entity.Produto
 import laize_tech.back.repository.CompraProdutoRepository
+import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
 @RequestMapping("/compras")
-class CompraProdutoJpaController (val repositorio: CompraProdutoRepository) {
+class CompraProdutoJpaController(
+    val compraProdutoRepository: CompraProdutoRepository,
+    val produtoRepository: ProdutoRepository
+) {
 
     @GetMapping
     fun get(): ResponseEntity<List<CompraProduto>> {
-        val compras = repositorio.findAll()
-        return if (compras.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(compras)
-        }
-    }
-
-    @GetMapping("/por-data")
-    fun getByData(@RequestParam inicio: String, @RequestParam fim: String): ResponseEntity<List<CompraProduto>> {
-        val inicioDate = LocalDate.parse(inicio)
-        val fimDate = LocalDate.parse(fim)
-        val compras = repositorio.findByDtCompraBetween(inicioDate, fimDate)
-
-        return if (compras.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(compras)
-        }
-    }
-
-    @GetMapping("/por-produto/{idProduto}")
-    fun getByProduto(@PathVariable idProduto: Int): ResponseEntity<List<CompraProduto>> {
-        val compras = repositorio.findByProdutoIdProduto(idProduto)
-
+        val compras = compraProdutoRepository.findAll()
         return if (compras.isEmpty()) {
             ResponseEntity.status(204).build()
         } else {
@@ -46,25 +28,44 @@ class CompraProdutoJpaController (val repositorio: CompraProdutoRepository) {
     }
 
     @PostMapping("/adicionar")
-    fun post(@RequestBody @Valid novaCompra: CompraProduto): ResponseEntity<CompraProduto> {
-        val compra = repositorio.save(novaCompra)
-        return ResponseEntity.status(201).body(compra)
+    fun adicionarCompra(@RequestBody @Valid compraProdutoDTO: CompraProdutoDTO): ResponseEntity<CompraProduto> {
+        val produto: Produto = produtoRepository.findById(compraProdutoDTO.idProduto.toLong().toInt()).orElseThrow {
+            IllegalArgumentException("Produto não encontrado com o ID: ${compraProdutoDTO.idProduto}")
+        }
+
+        val novaCompra = CompraProduto(
+            fornecedor = compraProdutoDTO.fornecedor,
+            precoCompra = compraProdutoDTO.precoCompra,
+            dtCompra = compraProdutoDTO.dtCompra ?: LocalDate.now(),
+            quantidadeProduto = compraProdutoDTO.quantidadeProduto,
+            produto = produto
+        )
+
+        val compraSalva = compraProdutoRepository.save(novaCompra)
+        return ResponseEntity.status(201).body(compraSalva)
     }
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody compraAtualizada: CompraProduto): ResponseEntity<CompraProduto> {
-        if (!repositorio.existsById(id)) {
+        if (!compraProdutoRepository.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        compraAtualizada.idCompraProduto = id
-        val compras = repositorio.save(compraAtualizada)
-        return ResponseEntity.status(200).body(compras)
+        val compraExistente = compraProdutoRepository.findById(id).orElse(null)
+            ?: return ResponseEntity.status(404).body(null)
+
+        compraExistente.fornecedor = compraAtualizada.fornecedor
+        compraExistente.precoCompra = compraAtualizada.precoCompra
+        compraExistente.dtCompra = compraAtualizada.dtCompra
+        compraExistente.quantidadeProduto = compraAtualizada.quantidadeProduto
+
+        val compraSalva = compraProdutoRepository.save(compraExistente)
+        return ResponseEntity.status(200).body(compraSalva)
     }
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
-        if (repositorio.existsById(id)) {
-            repositorio.deleteById(id)
+        if (compraProdutoRepository.existsById(id)) {
+            compraProdutoRepository.deleteById(id)
             return ResponseEntity.status(204).build()
         }
         val mensagem = "Não foi possível deletar a compra com id $id"

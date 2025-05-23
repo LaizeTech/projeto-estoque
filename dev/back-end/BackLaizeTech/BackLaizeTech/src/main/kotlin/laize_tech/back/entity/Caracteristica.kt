@@ -12,7 +12,8 @@ class Caracteristica (
     var idCaracteristica: Int? = null,
     var nomeTipoCaracteristica: String = "",
 
-    @ManyToOne
+
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkTipoCaracteristica", nullable = false)
     var tipoCaracteristica: TipoCaracteristica? = null
 
