@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "ProdutoCaracteristica")
-class ProdutoCaracteristica (
+data class ProdutoCaracteristica (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,15 +13,15 @@ class ProdutoCaracteristica (
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idProdutoCaracteristica: Int? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fkCaracteristica")
     var caracteristica: Caracteristica? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fkTipoCaracteristica")
     var tipoCaracteristica: TipoCaracteristica? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fkProduto")
     var produto: Produto? = null,
 

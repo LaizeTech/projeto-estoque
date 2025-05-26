@@ -1,8 +1,14 @@
 package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.CaracteristicaDTO
+import laize_tech.back.dto.ProdutoDTO
 import laize_tech.back.entity.Caracteristica
+import laize_tech.back.entity.Categoria
+import laize_tech.back.entity.Produto
+import laize_tech.back.entity.TipoCaracteristica
 import laize_tech.back.repository.CaracteristicaRepository
+import laize_tech.back.repository.TipoCaracteristicaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,12 +16,22 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/caracteristicas")
-class CaracteristicaJpaController(val caracteristicaRepository: CaracteristicaRepository) {
+class CaracteristicaJpaController(val caracteristicaRepository: CaracteristicaRepository,
+    val tipoCaracteristicaRepository: TipoCaracteristicaRepository
+) {
 
     @PostMapping("/adicionar")
-    fun create(@RequestBody @Valid caracteristica: Caracteristica): ResponseEntity<Caracteristica> {
-        val savedCaracteristica = caracteristicaRepository.save(caracteristica)
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCaracteristica)
+    fun post(@RequestBody @Valid novaCaracteristicaDTO: CaracteristicaDTO): ResponseEntity<Caracteristica> {
+        val tipoCaracteristica: TipoCaracteristica = tipoCaracteristicaRepository.findById(novaCaracteristicaDTO.idTipoCaracteristica).orElseThrow {
+            IllegalArgumentException("Categoria não encontrada com o ID: ${novaCaracteristicaDTO.idTipoCaracteristica}")
+        }
+
+        val novaCaracteristica = Caracteristica(
+            tipoCaracteristica = tipoCaracteristica,
+            nomeCaracteristica = novaCaracteristicaDTO.nomeCaracteristica
+        )
+
+        return ResponseEntity.status(201).body(caracteristicaRepository.save(novaCaracteristica))
     }
 
     @PutMapping("/{id}")
@@ -25,7 +41,6 @@ class CaracteristicaJpaController(val caracteristicaRepository: CaracteristicaRe
         val existingCaracteristica = caracteristicaRepository.findById(id)
         return if (existingCaracteristica.isPresent) {
             val updatedCaracteristica = existingCaracteristica.get().apply {
-                nomeTipoCaracteristica = caracteristicaDetails.nomeTipoCaracteristica
                 tipoCaracteristica = caracteristicaDetails.tipoCaracteristica
             }
             caracteristicaRepository.save(updatedCaracteristica)

@@ -10,7 +10,7 @@ class Caracteristica (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idCaracteristica: Int? = null,
-    var nomeTipoCaracteristica: String = "",
+    var nomeCaracteristica: String = "",
 
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
