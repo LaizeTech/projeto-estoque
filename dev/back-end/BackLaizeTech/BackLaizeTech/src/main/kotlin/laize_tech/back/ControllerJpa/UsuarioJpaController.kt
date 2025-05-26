@@ -6,6 +6,7 @@ import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import laize_tech.back.repository.EmpresaRepository
 import laize_tech.back.repository.UsuarioRepository
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -16,7 +17,7 @@ class UsuarioJpaController(
     val empresaRepository: EmpresaRepository
 ) {
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novoUsuarioDTO: UsuarioDTO): ResponseEntity<Any> {
         if (novoUsuarioDTO.nome.isNullOrBlank() || novoUsuarioDTO.senha.isNullOrBlank() || novoUsuarioDTO.email.isNullOrBlank() || novoUsuarioDTO.idEmpresa == null) {
             return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
@@ -37,8 +38,12 @@ class UsuarioJpaController(
             acessoFinanceiro = novoUsuarioDTO.acessoFinanceiro ?: false,
             empresa = empresa
         )
-        val usuarioSalvo = repositorio.save(novoUsuario)
-        return ResponseEntity.status(201).body(usuarioSalvo)
+        return try {
+            val usuarioSalvo = repositorio.save(novoUsuario)
+            ResponseEntity.status(201).body(usuarioSalvo)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar usuário")
+        }
     }
 
     @PutMapping("/{id}")
@@ -68,6 +73,15 @@ class UsuarioJpaController(
 
         val usuarioSalvo = repositorio.save(usuarioExistente)
         return ResponseEntity.status(200).body(usuarioSalvo)
+    }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Int): ResponseEntity<String> {
+        if (repositorio.existsById(id)) {
+            repositorio.deleteById(id)
+            return ResponseEntity.status(204).build()
+        }
+        return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
     }
 
     @GetMapping
@@ -141,14 +155,5 @@ class UsuarioJpaController(
         } else {
             ResponseEntity.status(200).body(listagemUsuarios)
         }
-    }
-    
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Int): ResponseEntity<String> {
-        if (repositorio.existsById(id)) {
-            repositorio.deleteById(id)
-            return ResponseEntity.status(204).build()
-        }
-        return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
     }
 }
