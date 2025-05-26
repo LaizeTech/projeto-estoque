@@ -8,4 +8,8 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 
 interface UsuarioRepository : JpaRepository<Usuario, Int> {
+    fun findByNome(nome: String): List<Usuario>
+
+    fun findByAcessoFinanceiro(AcessoFinanceiro: Boolean): List<Usuario>
+
 }
