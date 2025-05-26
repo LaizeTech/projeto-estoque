@@ -12,7 +12,7 @@ data class Usuario(
     val senha: String,
     val acessoFinanceiro: Boolean,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkEmpresa")
     val empresa: Empresa
 ) {
