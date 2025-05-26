@@ -42,11 +42,7 @@ class ItensSaida(
     @ManyToOne
     @JoinColumn(name = "fkProduto")
     @NotNull
-    var produto: Produto? = null,
-
-    @field:Positive
-    @NotNull
-    var subTotal: Double? = null
+    var produto: Produto? = null
 ) {
-    constructor() : this(null, null, null, null, null, null, null, null, null)
+    constructor() : this(null, null, null, null, null, null, null, null)
 }

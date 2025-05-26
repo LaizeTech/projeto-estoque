@@ -1,6 +1,7 @@
 package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.ItensSaidaDTO
 import laize_tech.back.entity.ItensSaida
 import laize_tech.back.repository.*
 import org.springframework.http.ResponseEntity
@@ -29,95 +30,93 @@ class ItensSaidaJpaController(
         }
     }
 
-    @PostMapping("/adicionar")
-    fun post(@RequestBody @Valid novoItem: ItensSaida): ResponseEntity<ItensSaida> {
+    fun post(@RequestBody @Valid novoItem: ItensSaidaDTO): ResponseEntity<ItensSaida> {
         // Valide e carregue entidades relacionadas
-        val tipoCaracteristica = novoItem.tipoCaracteristica?.idTipoCaracteristica?.let {
-            tipoCaracteristicaRepository.findById(it.toLong()).orElseThrow {
+        val tipoCaracteristica = novoItem.idTipoCaracteristica.let {
+            tipoCaracteristicaRepository.findById(it).orElseThrow {
                 IllegalArgumentException("TipoCaracteristica com ID $it não encontrado")
             }
         }
-        val caracteristica = novoItem.caracteristica?.idCaracteristica?.let {
-            caracteristicaRepository.findById(it.toLong().toInt()).orElseThrow {
+        val caracteristica = novoItem.idCaracteristica.let {
+            caracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Caracteristica com ID $it não encontrada")
             }
         }
 
-        val plataforma = novoItem.plataforma?.idPlataforma?.let {
-            plataformaRepository.findById(it.toLong().toInt()).orElseThrow {
+        val plataforma = novoItem.idPlataforma.let {
+            plataformaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Plataforma com ID $it não encontrada")
             }
         }
 
-        val produto = novoItem.produto?.idProduto?.let {
-            produtoRepository.findById(it.toLong().toInt()).orElseThrow {
+        val produto = novoItem.idProduto.let {
+            produtoRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Produto com ID $it não encontrada")
             }
         }
 
-        val saida = novoItem.saida?.idSaida?.let {
-            saidaRepository.findById(it.toLong().toInt()).orElseThrow {
+        val saida = novoItem.idSaida.let {
+            saidaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Saida com ID $it não encontrada")
             }
         }
 
-        val produtoCaracteristica = novoItem.produtoCaracteristica?.idProdutoCaracteristica?.let {
-            produtoCaracteristicaRepository.findById(it.toLong().toInt()).orElseThrow {
+        val produtoCaracteristica = novoItem.idProdutoCaracteristica.let {
+            produtoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("ProdutoCaracteristica com ID $it não encontrada")
             }
         }
 
-        novoItem.tipoCaracteristica = tipoCaracteristica
-        novoItem.caracteristica = caracteristica
-        novoItem.plataforma = plataforma
-        novoItem.produto = produto
-        novoItem.saida = saida
-        novoItem.produtoCaracteristica = produtoCaracteristica
+        val item = ItensSaida(
+            saida = saida,
+            plataforma = plataforma,
+            quantidade = novoItem.quantidade,
+            tipoCaracteristica = tipoCaracteristica,
+            caracteristica = caracteristica,
+            produtoCaracteristica = produtoCaracteristica,
+            produto = produto
+        )
 
-        // Salve o item
-        val itens = repositorio.save(novoItem)
+        val itens = repositorio.save(item)
         return ResponseEntity.status(201).body(itens)
     }
 
-    @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody itemAtualizado: ItensSaida): ResponseEntity<ItensSaida> {
+    fun put(@PathVariable id: Int, @RequestBody itemAtualizado: ItensSaidaDTO): ResponseEntity<ItensSaida> {
         val itemExistente = repositorio.findById(id).orElse(null)
             ?: return ResponseEntity.status(404).build()
 
-        // Atualize os campos do itemExistente com os valores do itemAtualizado
-        itemAtualizado.saida?.idSaida?.let {
+        itemAtualizado.idSaida.let {
             itemExistente.saida = saidaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Saida com ID $it não encontrada")
             }
         }
-        itemAtualizado.plataforma?.idPlataforma?.let {
+        itemAtualizado.idPlataforma.let {
             itemExistente.plataforma = plataformaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Plataforma com ID $it não encontrada")
             }
         }
-        itemAtualizado.tipoCaracteristica?.idTipoCaracteristica?.let {
-            itemExistente.tipoCaracteristica = tipoCaracteristicaRepository.findById(it.toLong()).orElseThrow {
+        itemAtualizado.idTipoCaracteristica.let {
+            itemExistente.tipoCaracteristica = tipoCaracteristicaRepository.findById(it).orElseThrow {
                 IllegalArgumentException("TipoCaracteristica com ID $it não encontrada")
             }
         }
-        itemAtualizado.caracteristica?.idCaracteristica?.let {
+        itemAtualizado.idCaracteristica.let {
             itemExistente.caracteristica = caracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Caracteristica com ID $it não encontrada")
             }
         }
-        itemAtualizado.produtoCaracteristica?.idProdutoCaracteristica?.let {
+        itemAtualizado.idProdutoCaracteristica.let {
             itemExistente.produtoCaracteristica = produtoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("ProdutoCaracteristica com ID $it não encontrada")
             }
         }
-        itemAtualizado.produto?.idProduto?.let {
+        itemAtualizado.idProduto.let {
             itemExistente.produto = produtoRepository.findById(it.toInt()).orElseThrow {
                 IllegalArgumentException("Produto com ID $it não encontrada")
             }
         }
 
-        itemExistente.quantidade = itemAtualizado.quantidade ?: itemExistente.quantidade
-        itemExistente.subTotal = itemAtualizado.subTotal ?: itemExistente.subTotal
+        itemExistente.quantidade = itemAtualizado.quantidade
 
         val itens = repositorio.save(itemExistente)
         return ResponseEntity.status(200).body(itens)
