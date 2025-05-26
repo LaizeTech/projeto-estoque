@@ -16,24 +16,6 @@ class UsuarioJpaController(
     val empresaRepository: EmpresaRepository
 ) {
 
-    @GetMapping
-    fun get(): ResponseEntity<List<ListagemUsuarioDTO>> {
-        val usuarios = repositorio.findAll()
-        val listagemUsuarios = usuarios.map { usuario ->
-            ListagemUsuarioDTO(
-                nome = usuario.nome,
-                email = usuario.email,
-                acessoFinanceiro = usuario.acessoFinanceiro,
-                idEmpresa = usuario.empresa.idEmpresa
-            )
-        }
-        return if (listagemUsuarios.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(listagemUsuarios)
-        }
-    }
-    
     @PostMapping("/adicionar")
     fun post(@RequestBody @Valid novoUsuarioDTO: UsuarioDTO): ResponseEntity<Any> {
         if (novoUsuarioDTO.nome.isNullOrBlank() || novoUsuarioDTO.senha.isNullOrBlank() || novoUsuarioDTO.email.isNullOrBlank() || novoUsuarioDTO.idEmpresa == null) {
@@ -60,24 +42,107 @@ class UsuarioJpaController(
     }
 
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Any> {
-        if (!repositorio.existsById(id)) {
+    fun put(@PathVariable id: Long, @RequestBody @Valid usuarioDTO: UsuarioDTO): ResponseEntity<Any> {
+        if (!repositorio.existsById(id.toInt())) {
             return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
         }
 
-        if (usuarioAtualizado.nome.isBlank() || usuarioAtualizado.senha.isBlank() || usuarioAtualizado.email.isBlank()) {
+        if (usuarioDTO.nome.isNullOrBlank() || usuarioDTO.senha.isNullOrBlank() || usuarioDTO.email.isNullOrBlank() || usuarioDTO.idEmpresa == null) {
             return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
         }
 
-        if (repositorio.findAll().any { it.email == usuarioAtualizado.email && it.idUsuario != id.toLong() }) {
-            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioAtualizado.email}'.")
+        val usuarioExistente = repositorio.findById(id.toInt()).orElse(null)
+
+        if (repositorio.findAll().any { it.email == usuarioDTO.email && it.idUsuario != id }) {
+            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioDTO.email}'.")
         }
 
-        usuarioAtualizado.idUsuario = id.toLong()
-        val usuarioSalvo = repositorio.save(usuarioAtualizado)
+        val empresa = empresaRepository.findById(usuarioDTO.idEmpresa).orElse(null)
+            ?: return ResponseEntity.status(400).body("Empresa com o ID ${usuarioDTO.idEmpresa} não encontrada")
+
+        usuarioExistente.nome = usuarioDTO.nome
+        usuarioExistente.email = usuarioDTO.email
+        usuarioExistente.senha = usuarioDTO.senha
+        usuarioExistente.acessoFinanceiro = usuarioDTO.acessoFinanceiro ?: false
+        usuarioExistente.empresa = empresa
+
+        val usuarioSalvo = repositorio.save(usuarioExistente)
         return ResponseEntity.status(200).body(usuarioSalvo)
     }
 
+    @GetMapping
+    fun get(): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findAll()
+        val listagemUsuarios = mutableListOf<ListagemUsuarioDTO>()
+        for (usuario in usuarios) {
+            val listagemUsuario = ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+            listagemUsuarios.add(listagemUsuario)
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
+    }
+
+    @GetMapping("/{id}")
+    fun get(@PathVariable id: Int): ResponseEntity<Any> {
+        val usuario = repositorio.findById(id)
+        return if (usuario.isPresent) {
+            val usuarioEncontrado = usuario.get()
+            val listagemUsuario = ListagemUsuarioDTO(
+                nome = usuarioEncontrado.nome,
+                email = usuarioEncontrado.email,
+                acessoFinanceiro = usuarioEncontrado.acessoFinanceiro,
+                idEmpresa = usuarioEncontrado.empresa.idEmpresa
+            )
+            ResponseEntity.status(200).body(listagemUsuario)
+        } else {
+            ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+        }
+    }
+
+    @GetMapping("/nome/{nome}")
+    fun getByNome(@PathVariable nome: String): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findByNome(nome)
+        val listagemUsuarios = usuarios.map { usuario ->
+            ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
+    }
+
+    @GetMapping("/acessoFinanceiro/{acessoFinanceiro}")
+    fun getByAcessoFinanceiro(@PathVariable acessoFinanceiro: Boolean): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findByAcessoFinanceiro(acessoFinanceiro)
+        val listagemUsuarios = usuarios.map { usuario ->
+            ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
+    }
+    
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<String> {
         if (repositorio.existsById(id)) {
