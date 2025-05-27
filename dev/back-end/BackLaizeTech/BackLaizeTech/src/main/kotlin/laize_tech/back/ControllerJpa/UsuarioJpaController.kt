@@ -71,8 +71,12 @@ class UsuarioJpaController(
         usuarioExistente.acessoFinanceiro = usuarioDTO.acessoFinanceiro ?: false
         usuarioExistente.empresa = empresa
 
-        val usuarioSalvo = repositorio.save(usuarioExistente)
-        return ResponseEntity.status(200).body(usuarioSalvo)
+        return try {
+            val usuarioSalvo = repositorio.save(usuarioExistente)
+            return ResponseEntity.status(200).body(usuarioSalvo)
+        } catch (e: Exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar usuário")
+        }
     }
 
     @DeleteMapping("/{id}")
