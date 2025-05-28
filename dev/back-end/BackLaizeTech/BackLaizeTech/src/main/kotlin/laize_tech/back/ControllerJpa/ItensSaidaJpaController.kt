@@ -3,6 +3,7 @@ package laize_tech.back.ControllerJpa
 import jakarta.validation.Valid
 import laize_tech.back.dto.ItensSaidaDTO
 import laize_tech.back.entity.ItensSaida
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -35,36 +36,36 @@ class ItensSaidaJpaController(
         // Valide e carregue entidades relacionadas
         val tipoCaracteristica = novoItem.idTipoCaracteristica.let {
             tipoCaracteristicaRepository.findById(it).orElseThrow {
-                IllegalArgumentException("TipoCaracteristica com ID $it não encontrado")
+                IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
         val caracteristica = novoItem.idCaracteristica.let {
             caracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Caracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("Caracteristica", it)
             }
         }
 
         val plataforma = novoItem.idPlataforma.let {
             plataformaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Plataforma com ID $it não encontrada")
+                IdNaoEncontradoException("Plataforma", it)
             }
         }
 
         val produto = novoItem.idProduto.let {
             produtoRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Produto com ID $it não encontrada")
+                IdNaoEncontradoException("Produto", it)
             }
         }
 
         val saida = novoItem.idSaida.let {
             saidaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Saida com ID $it não encontrada")
+                IdNaoEncontradoException("Saida", it)
             }
         }
 
         val produtoCaracteristica = novoItem.idProdutoCaracteristica.let {
             produtoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("ProdutoCaracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("ProdutoCaracteristica", it)
             }
         }
 
@@ -89,32 +90,31 @@ class ItensSaidaJpaController(
 
         itemAtualizado.idSaida.let {
             itemExistente.saida = saidaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Saida com ID $it não encontrada")
+                IdNaoEncontradoException("Saida", it)
             }
         }
         itemAtualizado.idPlataforma.let {
             itemExistente.plataforma = plataformaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Plataforma com ID $it não encontrada")
+                IdNaoEncontradoException("Plataforma", it)
             }
         }
         itemAtualizado.idTipoCaracteristica.let {
             itemExistente.tipoCaracteristica = tipoCaracteristicaRepository.findById(it).orElseThrow {
-                IllegalArgumentException("TipoCaracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
         itemAtualizado.idCaracteristica.let {
             itemExistente.caracteristica = caracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Caracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("Caracteristica", it)
             }
         }
         itemAtualizado.idProdutoCaracteristica.let {
             itemExistente.produtoCaracteristica = produtoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("ProdutoCaracteristica com ID $it não encontrada")
-            }
+                IdNaoEncontradoException("ProdutoCaracteristica", it)            }
         }
         itemAtualizado.idProduto.let {
             itemExistente.produto = produtoRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Produto com ID $it não encontrada")
+                IdNaoEncontradoException("Produto", it)
             }
         }
 

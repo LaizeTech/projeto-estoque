@@ -2,11 +2,9 @@ package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
 import laize_tech.back.dto.CaracteristicaDTO
-import laize_tech.back.dto.ProdutoDTO
 import laize_tech.back.entity.Caracteristica
-import laize_tech.back.entity.Categoria
-import laize_tech.back.entity.Produto
 import laize_tech.back.entity.TipoCaracteristica
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CaracteristicaRepository
 import laize_tech.back.repository.TipoCaracteristicaRepository
 import org.springframework.http.HttpStatus
@@ -22,8 +20,13 @@ class CaracteristicaJpaController(val caracteristicaRepository: CaracteristicaRe
 
     @PostMapping
     fun post(@RequestBody @Valid novaCaracteristicaDTO: CaracteristicaDTO): ResponseEntity<Caracteristica> {
-        val tipoCaracteristica: TipoCaracteristica = tipoCaracteristicaRepository.findById(novaCaracteristicaDTO.idTipoCaracteristica).orElseThrow {
-            IllegalArgumentException("Categoria não encontrada com o ID: ${novaCaracteristicaDTO.idTipoCaracteristica}")
+//        val tipoCaracteristica: TipoCaracteristica = tipoCaracteristicaRepository.findById(novaCaracteristicaDTO.idTipoCaracteristica).orElseThrow {
+//            IllegalArgumentException("Categoria não encontrada com o ID: ${novaCaracteristicaDTO.idTipoCaracteristica}")        }
+
+        val tipoCaracteristica = novaCaracteristicaDTO.idTipoCaracteristica.let {
+            tipoCaracteristicaRepository.findById(it).orElseThrow {
+                IdNaoEncontradoException("TipoCaracteristica", it)
+            }
         }
 
         val novaCaracteristica = Caracteristica(

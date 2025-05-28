@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import laize_tech.back.dto.CompraProdutoDTO
 import laize_tech.back.entity.CompraProduto
 import laize_tech.back.entity.Produto
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CompraProdutoRepository
 import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
@@ -29,8 +30,14 @@ class CompraProdutoJpaController(
 
     @PostMapping
     fun adicionarCompra(@RequestBody @Valid compraProdutoDTO: CompraProdutoDTO): ResponseEntity<CompraProduto> {
-        val produto: Produto = produtoRepository.findById(compraProdutoDTO.idProduto.toLong().toInt()).orElseThrow {
-            IllegalArgumentException("Produto não encontrado com o ID: ${compraProdutoDTO.idProduto}")
+//        val produto: Produto = produtoRepository.findById(compraProdutoDTO.idProduto.toLong().toInt()).orElseThrow {
+//            IllegalArgumentException("Produto não encontrado com o ID: ${compraProdutoDTO.idProduto}")
+//        }
+
+        val produto = compraProdutoDTO.idProduto.let {
+            produtoRepository.findById(it.toInt()).orElseThrow {
+                IdNaoEncontradoException("Produto", it)
+            }
         }
 
         val novaCompra = CompraProduto(
@@ -50,8 +57,12 @@ class CompraProdutoJpaController(
         if (!compraProdutoRepository.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        val compraExistente = compraProdutoRepository.findById(id).orElse(null)
-            ?: return ResponseEntity.status(404).body(null)
+
+        val compraExistente = compraAtualizada.idCompraProduto?.let { idCompraProduto ->
+            compraProdutoRepository.findById(idCompraProduto).orElseThrow {
+                IdNaoEncontradoException("TipoCaracteristica", idCompraProduto)
+            }
+        } ?: throw IllegalArgumentException("idCompraProduto não pode ser nulo")
 
         compraExistente.fornecedor = compraAtualizada.fornecedor
         compraExistente.precoCompra = compraAtualizada.precoCompra
