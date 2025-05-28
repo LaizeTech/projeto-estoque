@@ -1,4 +1,4 @@
-//package laize_tech.back.controller
+//package laize_tech.back.ControllerJpa
 //
 //import org.springframework.http.ResponseEntity
 //import org.springframework.web.bind.annotation.*
