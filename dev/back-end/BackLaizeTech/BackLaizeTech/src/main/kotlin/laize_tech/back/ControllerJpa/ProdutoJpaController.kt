@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import laize_tech.back.dto.ProdutoDTO
 import laize_tech.back.entity.Categoria
 import laize_tech.back.entity.Produto
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
 import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
@@ -29,7 +30,7 @@ class ProdutoJpaController (
     @PostMapping
     fun post(@RequestBody @Valid novoProdutoDTO: ProdutoDTO): ResponseEntity<Produto> {
         val categoria: Categoria = categoriaRepository.findById(novoProdutoDTO.idCategoria.toInt()).orElseThrow {
-            IllegalArgumentException("Categoria não encontrada com o ID: ${novoProdutoDTO.idCategoria}")
+            IdNaoEncontradoException("Categoria", novoProdutoDTO.idCategoria.toInt())
         }
 
         val novoProduto = Produto(
@@ -57,15 +58,16 @@ class ProdutoJpaController (
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody produtoAtualizadoDTO: ProdutoDTO): ResponseEntity<Any> {
-        val produtoExistente = produtoRepository.findById(id.toInt()).orElse(null)
-            ?: return ResponseEntity.status(404).body("Produto não encontrado")
+        val produtoExistente = produtoRepository.findById(id.toInt()).orElseThrow {
+            IdNaoEncontradoException("Produto", id)
+        }
 
         if (produtoAtualizadoDTO.nomeProduto.isBlank()) {
             return ResponseEntity.status(400).body("Nome do produto não pode estar em branco")
         }
 
         val categoria: Categoria = categoriaRepository.findById(produtoAtualizadoDTO.idCategoria.toInt()).orElseThrow {
-            IllegalArgumentException("Categoria não encontrada com o ID: ${produtoAtualizadoDTO.idCategoria}")
+            IdNaoEncontradoException("Categoria", produtoAtualizadoDTO.idCategoria.toInt())
         }
 
         produtoExistente.categoria = categoria

@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import laize_tech.back.dto.ListagemUsuarioDTO
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.EmpresaRepository
 import laize_tech.back.repository.UsuarioRepository
 import org.springframework.http.HttpStatus
@@ -27,8 +28,9 @@ class UsuarioJpaController(
             return ResponseEntity.status(409).body("Já existe um usuário cadastrado com esse e-mail!")
         }
 
-        val empresa = empresaRepository.findById(novoUsuarioDTO.idEmpresa).orElse(null)
-            ?: return ResponseEntity.status(400).body("Empresa com o ID ${novoUsuarioDTO.idEmpresa} não encontrada")
+        val empresa = empresaRepository.findById(novoUsuarioDTO.idEmpresa).orElseThrow {
+            IdNaoEncontradoException("Empresa", novoUsuarioDTO.idEmpresa)
+        }
 
         val novoUsuario = Usuario(
             idUsuario = 0,
@@ -62,8 +64,9 @@ class UsuarioJpaController(
             return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioDTO.email}'.")
         }
 
-        val empresa = empresaRepository.findById(usuarioDTO.idEmpresa).orElse(null)
-            ?: return ResponseEntity.status(400).body("Empresa com o ID ${usuarioDTO.idEmpresa} não encontrada")
+        val empresa = empresaRepository.findById(usuarioDTO.idEmpresa).orElseThrow {
+            IdNaoEncontradoException("Empresa", usuarioDTO.idEmpresa)
+        }
 
         usuarioExistente.nome = usuarioDTO.nome
         usuarioExistente.email = usuarioDTO.email
