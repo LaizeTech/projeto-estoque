@@ -9,7 +9,7 @@ class Caracteristica (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var idCaracteristica: Int? = null,
+    var id: Int? = null,
     var nomeCaracteristica: String = "",
 
 

@@ -34,7 +34,7 @@ class ProdutoCaracteristicaJpaController(
 
     @GetMapping("/caracteristica/{codigo}")
     fun getProdutoPorCaracteristica(@PathVariable codigo: Int): ResponseEntity<List<ProdutoCaracteristica>> {
-        val produtoCaracteristica = repositorio.findByCaracteristicaId(codigo)
+        val produtoCaracteristica = repositorio.findByCaracteristica_Id(codigo)
 
         if (produtoCaracteristica.isEmpty()) {
             throw IdNaoEncontradoException("Caracteristica", codigo)

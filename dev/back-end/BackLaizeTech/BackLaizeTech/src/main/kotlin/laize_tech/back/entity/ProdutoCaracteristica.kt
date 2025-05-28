@@ -13,8 +13,8 @@ data class ProdutoCaracteristica (
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idProdutoCaracteristica: Int? = null,
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fkCaracteristica")
+    @ManyToOne
+    @JoinColumn(name = "caracteristica_id")
     var caracteristica: Caracteristica? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
