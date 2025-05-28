@@ -7,14 +7,14 @@ data class Usuario(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var idUsuario: Long,
 
-    val nome: String,
-    val email: String,
-    val senha: String,
-    val acessoFinanceiro: Boolean,
+    var nome: String,
+    var email: String,
+    var senha: String,
+    var acessoFinanceiro: Boolean,
 
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "fkEmpresa")
-    val empresa: Empresa
+    var empresa: Empresa
 ) {
     constructor() : this(0, "", "", "", false, Empresa())
 }

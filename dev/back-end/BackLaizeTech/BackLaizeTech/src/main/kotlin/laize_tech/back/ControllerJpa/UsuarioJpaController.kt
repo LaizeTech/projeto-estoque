@@ -1,89 +1,82 @@
 package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.ListagemUsuarioDTO
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
+import laize_tech.back.repository.EmpresaRepository
 import laize_tech.back.repository.UsuarioRepository
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/usuarios")
-class UsuarioJpaController(val repositorio: UsuarioRepository) {
+class UsuarioJpaController(
+    val repositorio: UsuarioRepository,
+    val empresaRepository: EmpresaRepository
+) {
 
-    @GetMapping
-    fun get(): ResponseEntity<List<UsuarioDTO>> {
-        val usuarios = repositorio.findUsuarioDTOs()
-        return if (usuarios.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(usuarios)
-        }
-    }
-
-    @GetMapping("/por-nome")
-    fun getByNome(@RequestParam nomeFragmento: String): ResponseEntity<List<UsuarioDTO>> {
-        val usuarios = repositorio.findByNomeContainingIgnoreCase(nomeFragmento)
-        return if (usuarios.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            val usuariosDTO = usuarios.map { UsuarioDTO(it.nome, it.email, it.acessoFinanceiro) }
-            ResponseEntity.status(200).body(usuariosDTO)
-        }
-    }
-
-    @GetMapping("/com-acesso-financeiro")
-    fun getUsuariosComAcessoFinanceiro(): ResponseEntity<List<UsuarioDTO>> {
-        val usuarios = repositorio.findByAcessoFinanceiroTrue()
-        return if (usuarios.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            val usuariosDTO = usuarios.map { UsuarioDTO(it.nome, it.email, it.acessoFinanceiro) }
-            ResponseEntity.status(200).body(usuariosDTO)
-        }
-    }
-
-    @GetMapping("/por-email")
-    fun getByEmail(@RequestParam email: String): ResponseEntity<UsuarioDTO> {
-        val usuarioDTO = repositorio.findUsuarioDTOByEmail(email)
-        return if (usuarioDTO == null) {
-            ResponseEntity.status(404).body(usuarioDTO)
-        } else {
-            ResponseEntity.status(200).body(usuarioDTO)
-        }
-    }
-
-    @PostMapping("/adicionar")
-    fun post(@RequestBody @Valid novoUsuario: Usuario): ResponseEntity<Any> {
-        if (novoUsuario.nome.isBlank() || novoUsuario.senha.isBlank() || novoUsuario.email.isBlank()) {
+    @PostMapping
+    fun post(@RequestBody @Valid novoUsuarioDTO: UsuarioDTO): ResponseEntity<Any> {
+        if (novoUsuarioDTO.nome.isNullOrBlank() || novoUsuarioDTO.senha.isNullOrBlank() || novoUsuarioDTO.email.isNullOrBlank() || novoUsuarioDTO.idEmpresa == null) {
             return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
         }
 
-        if (repositorio.findAll().any { it.email == novoUsuario.email }) {
+        if (repositorio.findAll().any { it.email == novoUsuarioDTO.email }) {
             return ResponseEntity.status(409).body("Já existe um usuário cadastrado com esse e-mail!")
         }
 
-        val usuarioSalvo = repositorio.save(novoUsuario)
-        return ResponseEntity.status(201).body(usuarioSalvo)
+        val empresa = empresaRepository.findById(novoUsuarioDTO.idEmpresa).orElse(null)
+            ?: return ResponseEntity.status(400).body("Empresa com o ID ${novoUsuarioDTO.idEmpresa} não encontrada")
+
+        val novoUsuario = Usuario(
+            idUsuario = 0,
+            nome = novoUsuarioDTO.nome,
+            email = novoUsuarioDTO.email,
+            senha = novoUsuarioDTO.senha,
+            acessoFinanceiro = novoUsuarioDTO.acessoFinanceiro ?: false,
+            empresa = empresa
+        )
+        return try {
+            val usuarioSalvo = repositorio.save(novoUsuario)
+            ResponseEntity.status(201).body(usuarioSalvo)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar usuário")
+        }
     }
 
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody usuarioAtualizado: Usuario): ResponseEntity<Any> {
-        if (!repositorio.existsById(id)) {
+    fun put(@PathVariable id: Long, @RequestBody @Valid usuarioDTO: UsuarioDTO): ResponseEntity<Any> {
+        if (!repositorio.existsById(id.toInt())) {
             return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
         }
 
-        if (usuarioAtualizado.nome.isBlank() || usuarioAtualizado.senha.isBlank() || usuarioAtualizado.email.isBlank()) {
+        if (usuarioDTO.nome.isNullOrBlank() || usuarioDTO.senha.isNullOrBlank() || usuarioDTO.email.isNullOrBlank() || usuarioDTO.idEmpresa == null) {
             return ResponseEntity.status(400).body("Os campos nome, senha e email não podem estar vazios ou nulos!")
         }
 
-        if (repositorio.findAll().any { it.email == usuarioAtualizado.email && it.idUsuario != id.toLong() }) {
-            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioAtualizado.email}'.")
+        val usuarioExistente = repositorio.findById(id.toInt()).orElse(null)
+
+        if (repositorio.findAll().any { it.email == usuarioDTO.email && it.idUsuario != id }) {
+            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioDTO.email}'.")
         }
 
-        usuarioAtualizado.idUsuario = id.toLong()
-        val usuarioSalvo = repositorio.save(usuarioAtualizado)
-        return ResponseEntity.status(200).body(usuarioSalvo)
+        val empresa = empresaRepository.findById(usuarioDTO.idEmpresa).orElse(null)
+            ?: return ResponseEntity.status(400).body("Empresa com o ID ${usuarioDTO.idEmpresa} não encontrada")
+
+        usuarioExistente.nome = usuarioDTO.nome
+        usuarioExistente.email = usuarioDTO.email
+        usuarioExistente.senha = usuarioDTO.senha
+        usuarioExistente.acessoFinanceiro = usuarioDTO.acessoFinanceiro ?: false
+        usuarioExistente.empresa = empresa
+
+        return try {
+            val usuarioSalvo = repositorio.save(usuarioExistente)
+            return ResponseEntity.status(200).body(usuarioSalvo)
+        } catch (e: Exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar usuário")
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -92,7 +85,79 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
             repositorio.deleteById(id)
             return ResponseEntity.status(204).build()
         }
-
         return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+    }
+
+    @GetMapping
+    fun get(): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findAll()
+        val listagemUsuarios = mutableListOf<ListagemUsuarioDTO>()
+        for (usuario in usuarios) {
+            val listagemUsuario = ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+            listagemUsuarios.add(listagemUsuario)
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
+    }
+
+    @GetMapping("/{id}")
+    fun get(@PathVariable id: Int): ResponseEntity<Any> {
+        val usuario = repositorio.findById(id)
+        return if (usuario.isPresent) {
+            val usuarioEncontrado = usuario.get()
+            val listagemUsuario = ListagemUsuarioDTO(
+                nome = usuarioEncontrado.nome,
+                email = usuarioEncontrado.email,
+                acessoFinanceiro = usuarioEncontrado.acessoFinanceiro,
+                idEmpresa = usuarioEncontrado.empresa.idEmpresa
+            )
+            ResponseEntity.status(200).body(listagemUsuario)
+        } else {
+            ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+        }
+    }
+
+    @GetMapping("/nome/{nome}")
+    fun getByNome(@PathVariable nome: String): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findByNome(nome)
+        val listagemUsuarios = usuarios.map { usuario ->
+            ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
+    }
+
+    @GetMapping("/acessoFinanceiro/{acessoFinanceiro}")
+    fun getByAcessoFinanceiro(@PathVariable acessoFinanceiro: Boolean): ResponseEntity<List<ListagemUsuarioDTO>> {
+        val usuarios = repositorio.findByAcessoFinanceiro(acessoFinanceiro)
+        val listagemUsuarios = usuarios.map { usuario ->
+            ListagemUsuarioDTO(
+                nome = usuario.nome,
+                email = usuario.email,
+                acessoFinanceiro = usuario.acessoFinanceiro,
+                idEmpresa = usuario.empresa.idEmpresa
+            )
+        }
+        return if (listagemUsuarios.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(listagemUsuarios)
+        }
     }
 }

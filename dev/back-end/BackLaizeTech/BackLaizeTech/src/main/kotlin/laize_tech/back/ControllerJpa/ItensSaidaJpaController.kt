@@ -30,6 +30,7 @@ class ItensSaidaJpaController(
         }
     }
 
+    @PostMapping("/adicionar")
     fun post(@RequestBody @Valid novoItem: ItensSaidaDTO): ResponseEntity<ItensSaida> {
         // Valide e carregue entidades relacionadas
         val tipoCaracteristica = novoItem.idTipoCaracteristica.let {
@@ -81,6 +82,7 @@ class ItensSaidaJpaController(
         return ResponseEntity.status(201).body(itens)
     }
 
+    @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody itemAtualizado: ItensSaidaDTO): ResponseEntity<ItensSaida> {
         val itemExistente = repositorio.findById(id).orElse(null)
             ?: return ResponseEntity.status(404).build()

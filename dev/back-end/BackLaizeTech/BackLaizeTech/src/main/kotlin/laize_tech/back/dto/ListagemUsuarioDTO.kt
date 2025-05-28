@@ -1,9 +1,8 @@
 package laize_tech.back.dto
 
-data class UsuarioDTO(
+data class ListagemUsuarioDTO(
     val nome: String?,
     val email: String?,
-    val senha: String?,
     val acessoFinanceiro: Boolean?,
     val idEmpresa: Int?
 )

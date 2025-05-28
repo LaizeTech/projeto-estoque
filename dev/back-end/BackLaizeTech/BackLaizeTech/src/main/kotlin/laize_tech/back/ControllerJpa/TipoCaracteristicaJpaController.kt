@@ -22,9 +22,8 @@ class TipoCaracteristicaJpaController (
     fun update(@PathVariable id: Long, @RequestBody @Valid tipoCaracteristica: TipoCaracteristica): ResponseEntity<TipoCaracteristica> {
         val existingTipoCaracteristica = tipoCaracteristicaRepository.findById(id)
         return if (existingTipoCaracteristica.isPresent) {
-            val updatedTipoCaracteristica = existingTipoCaracteristica.get().apply {
-                nomeTipoCaracteristica = tipoCaracteristica.nomeTipoCaracteristica
-            }
+            val updatedTipoCaracteristica = existingTipoCaracteristica.get()
+            updatedTipoCaracteristica.nomeTipoCaracteristica = tipoCaracteristica.nomeTipoCaracteristica
             tipoCaracteristicaRepository.save(updatedTipoCaracteristica)
             ResponseEntity.ok(updatedTipoCaracteristica)
         } else {
