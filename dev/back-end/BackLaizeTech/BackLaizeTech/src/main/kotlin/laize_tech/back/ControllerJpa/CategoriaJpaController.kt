@@ -21,7 +21,7 @@ class  CategoriaJpaController (val repositorio: CategoriaRepository) {
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novaCategoria: Categoria): ResponseEntity<Any> {
 
         if (novaCategoria.nomeCategoria.isBlank()) {

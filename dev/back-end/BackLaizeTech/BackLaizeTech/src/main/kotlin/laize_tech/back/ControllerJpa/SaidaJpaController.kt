@@ -33,7 +33,7 @@ class SaidaJpaController(
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novaSaidaDTO: SaidaDTO): ResponseEntity<Saida> {
         val tipoSaida = tipoSaidaRepository.findById(novaSaidaDTO.idTipoSaida).orElseThrow {
             IllegalArgumentException("TipoSaida não encontrado com o ID: ${novaSaidaDTO.idTipoSaida}")

@@ -21,7 +21,7 @@ class StatusVendaJpaController(val repositorio: StatusVendaRepository) {
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novoStatusVenda: StatusVenda): ResponseEntity<Any> {
         val statusVendaSalvo = repositorio.save(novoStatusVenda)
         return ResponseEntity.status(201).body(statusVendaSalvo)

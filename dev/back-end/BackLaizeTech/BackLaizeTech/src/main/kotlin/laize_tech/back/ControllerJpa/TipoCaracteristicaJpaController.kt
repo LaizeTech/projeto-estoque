@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class TipoCaracteristicaJpaController (
     val tipoCaracteristicaRepository: TipoCaracteristicaRepository
 ){
-    @PostMapping("/adicionar")
+    @PostMapping
     fun create(@RequestBody @Valid tipoCaracteristica: TipoCaracteristica): ResponseEntity<TipoCaracteristica> {
         val savedTipoCaracteristica = tipoCaracteristicaRepository.save(tipoCaracteristica)
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTipoCaracteristica)

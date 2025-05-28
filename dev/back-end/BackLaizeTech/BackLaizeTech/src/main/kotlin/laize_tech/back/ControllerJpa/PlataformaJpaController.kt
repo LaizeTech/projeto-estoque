@@ -26,7 +26,7 @@ class PlataformaJpaController(private val plataformaRepository: PlataformaReposi
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novaPlataformaDTO: PlataformaDTO): ResponseEntity<Plataforma> {
         val empresa = novaPlataformaDTO.idEmpresa?.let { idEmpresa ->
             empresaRepository.findById(idEmpresa).orElseThrow {

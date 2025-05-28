@@ -30,7 +30,7 @@ class ItensSaidaJpaController(
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novoItem: ItensSaidaDTO): ResponseEntity<ItensSaida> {
         // Valide e carregue entidades relacionadas
         val tipoCaracteristica = novoItem.idTipoCaracteristica.let {

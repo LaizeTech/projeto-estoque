@@ -27,7 +27,7 @@ class CompraProdutoJpaController(
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun adicionarCompra(@RequestBody @Valid compraProdutoDTO: CompraProdutoDTO): ResponseEntity<CompraProduto> {
         val produto: Produto = produtoRepository.findById(compraProdutoDTO.idProduto.toLong().toInt()).orElseThrow {
             IllegalArgumentException("Produto não encontrado com o ID: ${compraProdutoDTO.idProduto}")

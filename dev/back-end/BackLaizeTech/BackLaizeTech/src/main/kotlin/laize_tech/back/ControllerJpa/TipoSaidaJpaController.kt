@@ -21,7 +21,7 @@ class TipoSaidaJpaController(val repositorio: TipoSaidaRepository) {
         }
     }
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novoTipoSaida: TipoSaida): ResponseEntity<Any> {
         val tipoSaidaSalvo = repositorio.save(novoTipoSaida)
         return ResponseEntity.status(201).body(tipoSaidaSalvo)

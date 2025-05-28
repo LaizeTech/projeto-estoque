@@ -20,7 +20,7 @@ class CaracteristicaJpaController(val caracteristicaRepository: CaracteristicaRe
     val tipoCaracteristicaRepository: TipoCaracteristicaRepository
 ) {
 
-    @PostMapping("/adicionar")
+    @PostMapping
     fun post(@RequestBody @Valid novaCaracteristicaDTO: CaracteristicaDTO): ResponseEntity<Caracteristica> {
         val tipoCaracteristica: TipoCaracteristica = tipoCaracteristicaRepository.findById(novaCaracteristicaDTO.idTipoCaracteristica).orElseThrow {
             IllegalArgumentException("Categoria não encontrada com o ID: ${novaCaracteristicaDTO.idTipoCaracteristica}")
