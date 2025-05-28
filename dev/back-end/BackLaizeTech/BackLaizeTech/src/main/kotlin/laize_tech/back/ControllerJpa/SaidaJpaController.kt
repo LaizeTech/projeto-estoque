@@ -3,6 +3,7 @@ package laize_tech.back.ControllerJpa
 import jakarta.validation.Valid
 import laize_tech.back.dto.SaidaDTO
 import laize_tech.back.entity.Saida
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.SaidaRepository
 import laize_tech.back.repository.TipoSaidaRepository
 import laize_tech.back.repository.EmpresaRepository
@@ -36,19 +37,19 @@ class SaidaJpaController(
     @PostMapping
     fun post(@RequestBody @Valid novaSaidaDTO: SaidaDTO): ResponseEntity<Saida> {
         val tipoSaida = tipoSaidaRepository.findById(novaSaidaDTO.idTipoSaida).orElseThrow {
-            IllegalArgumentException("TipoSaida não encontrado com o ID: ${novaSaidaDTO.idTipoSaida}")
+            IdNaoEncontradoException("TipoSaida", novaSaidaDTO.idTipoSaida)
         }
 
         val empresa = empresaRepository.findById(novaSaidaDTO.idEmpresa).orElseThrow {
-            IllegalArgumentException("Empresa não encontrada com o ID: ${novaSaidaDTO.idEmpresa}")
+            IdNaoEncontradoException("Empresa", novaSaidaDTO.idEmpresa)
         }
 
         val plataforma = plataformaRepository.findById(novaSaidaDTO.idPlataforma).orElseThrow {
-            IllegalArgumentException("Plataforma não encontrada com o ID: ${novaSaidaDTO.idPlataforma}")
+            IdNaoEncontradoException("Plataforma", novaSaidaDTO.idPlataforma)
         }
 
         val statusVenda = statusVendaRepository.findById(novaSaidaDTO.idStatusVenda).orElseThrow {
-            IllegalArgumentException("StatusVenda não encontrado com o ID: ${novaSaidaDTO.idStatusVenda}")
+            IdNaoEncontradoException("StatusVenda", novaSaidaDTO.idStatusVenda)
         }
 
         val dtVenda: LocalDate = novaSaidaDTO.dtVenda?.let { LocalDate.parse(it) } ?: LocalDate.now()
@@ -70,23 +71,24 @@ class SaidaJpaController(
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody saidaAtualizadaDTO: SaidaDTO): ResponseEntity<Any> {
-        val saidaExistente = repositorio.findById(id).orElse(null)
-            ?: return ResponseEntity.status(404).body("Saída não encontrada")
+        val saidaExistente = repositorio.findById(id).orElseThrow {
+            IdNaoEncontradoException("Saída", id)
+        }
 
         val tipoSaida = tipoSaidaRepository.findById(saidaAtualizadaDTO.idTipoSaida).orElseThrow {
-            IllegalArgumentException("TipoSaida não encontrado com o ID: ${saidaAtualizadaDTO.idTipoSaida}")
+            IdNaoEncontradoException("TipoSaida", saidaAtualizadaDTO.idTipoSaida)
         }
 
         val empresa = empresaRepository.findById(saidaAtualizadaDTO.idEmpresa).orElseThrow {
-            IllegalArgumentException("Empresa não encontrada com o ID: ${saidaAtualizadaDTO.idEmpresa}")
+            IdNaoEncontradoException("Empresa", saidaAtualizadaDTO.idEmpresa)
         }
 
         val plataforma = plataformaRepository.findById(saidaAtualizadaDTO.idPlataforma).orElseThrow {
-            IllegalArgumentException("Plataforma não encontrada com o ID: ${saidaAtualizadaDTO.idPlataforma}")
+            IdNaoEncontradoException("Plataforma", saidaAtualizadaDTO.idPlataforma)
         }
 
         val statusVenda = statusVendaRepository.findById(saidaAtualizadaDTO.idStatusVenda).orElseThrow {
-            IllegalArgumentException("StatusVenda não encontrado com o ID: ${saidaAtualizadaDTO.idStatusVenda}")
+            IdNaoEncontradoException("StatusVenda", saidaAtualizadaDTO.idStatusVenda)
         }
 
         saidaExistente.tipoSaida = tipoSaida

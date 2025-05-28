@@ -5,6 +5,7 @@ import laize_tech.back.dto.PlataformaDTO
 import laize_tech.back.dto.ProdutoDTO
 import laize_tech.back.entity.Categoria
 import laize_tech.back.entity.Plataforma
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.EmpresaRepository
 import laize_tech.back.repository.PlataformaRepository
 import org.springframework.http.ResponseEntity
@@ -30,7 +31,7 @@ class PlataformaJpaController(private val plataformaRepository: PlataformaReposi
     fun post(@RequestBody @Valid novaPlataformaDTO: PlataformaDTO): ResponseEntity<Plataforma> {
         val empresa = novaPlataformaDTO.idEmpresa?.let { idEmpresa ->
             empresaRepository.findById(idEmpresa).orElseThrow {
-                IllegalArgumentException("Empresa não encontrada com o ID: $idEmpresa")
+                IdNaoEncontradoException("Empresa", idEmpresa)
             }
         }
 
@@ -81,8 +82,9 @@ class PlataformaJpaController(private val plataformaRepository: PlataformaReposi
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody @Valid plataformaDTO: PlataformaDTO): ResponseEntity<Any> {
-        val plataformaExistente = plataformaRepository.findById(id).orElse(null)
-            ?: return ResponseEntity.status(404).body("Plataforma não encontrada")
+        val plataformaExistente = plataformaRepository.findById(id).orElseThrow {
+            IdNaoEncontradoException("Plataforma", id)
+        }
 
         if (plataformaDTO.nomePlataforma?.isBlank() == true) {
             return ResponseEntity.status(400).body("Nome da plataforma não pode estar em branco")
