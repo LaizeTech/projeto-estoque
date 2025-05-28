@@ -14,7 +14,7 @@
 //    )
 //
 //    // Endpoint para listar todos os usuários
-////    @GetMapping("/listar")
+//    @GetMapping("/listar")
 //    fun listarUsuarios(): ResponseEntity<Any> {
 //        val usuarioLogado = listaUsuario.any { it.status }
 //        if (!usuarioLogado) {

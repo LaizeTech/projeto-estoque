@@ -3,12 +3,14 @@ package laize_tech.back.ControllerJpa
 
 import laize_tech.back.dto.ProdutoCaracteristicaDTO
 import laize_tech.back.entity.ProdutoCaracteristica
+import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CaracteristicaRepository
 import laize_tech.back.repository.ProdutoCaracteristicaRepository
 import laize_tech.back.repository.ProdutoRepository
 import laize_tech.back.repository.TipoCaracteristicaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/produto-caracteristica")
@@ -30,23 +32,33 @@ class ProdutoCaracteristicaJpaController(
         }
     }
 
+    @GetMapping("/caracteristica/{codigo}")
+    fun getProdutoPorCaracteristica(@PathVariable codigo: Int): ResponseEntity<List<ProdutoCaracteristica>> {
+        val produtoCaracteristica = repositorio.findByCaracteristicaId(codigo)
+
+        if (produtoCaracteristica.isEmpty()) {
+            throw IdNaoEncontradoException("Caracteristica", codigo)
+        }
+
+        return ResponseEntity.status(200).body(produtoCaracteristica)
+    }
+
     @PostMapping
     fun post(@RequestBody novoProduto: ProdutoCaracteristicaDTO): ResponseEntity<ProdutoCaracteristica> {
-        // Valide e carregue entidades relacionadas
         val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
             tipoCaracteristicaRepository.findById(it).orElseThrow {
-                IllegalArgumentException("TipoCaracteristica com ID $it não encontrado")
+                IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
         val caracteristica = novoProduto.idCaracteristica.let {
             caracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Caracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("Caracteristica", it)
             }
         }
 
         val produto = novoProduto.idProduto.let {
             produtoRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Produto com ID $it não encontrada")
+                IdNaoEncontradoException("Produto", it)
             }
         }
 
@@ -68,17 +80,17 @@ class ProdutoCaracteristicaJpaController(
 
         val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
             tipoCaracteristicaRepository.findById(it).orElseThrow {
-                IllegalArgumentException("TipoCaracteristica com ID $it não encontrado")
+                IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
         val caracteristica = novoProduto.idCaracteristica.let {
             caracteristicaRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Caracteristica com ID $it não encontrada")
+                IdNaoEncontradoException("Caracteristica", it)
             }
         }
         val produto = novoProduto.idProduto.let {
             produtoRepository.findById(it.toInt()).orElseThrow {
-                IllegalArgumentException("Produto com ID $it não encontrada")
+                IdNaoEncontradoException("Produto", it)
             }
         }
 
