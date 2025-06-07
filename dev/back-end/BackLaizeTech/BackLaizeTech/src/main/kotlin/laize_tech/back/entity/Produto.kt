@@ -1,33 +1,30 @@
 package laize_tech.back.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty
+
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDateTime
 
 @Entity
 data class Produto(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idProduto: Long,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val idProduto: Long = 0,             // <-- ÚNICO campo para o ID
 
-    @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkCategoria")
-    @JsonProperty("categoria")
-    var categoria: Categoria? = null,
+    @ManyToOne
+    @JoinColumn(name = "fk_categoria")
+    var categoria: Categoria?,
 
-    @JsonProperty("nomeProduto")
-    var nomeProduto: String? = null,
+    var nomeProduto: String?,            // <-- ÚNICO campo para o nome
 
-    @JsonProperty("dtRegistro")
-    val dtRegistro: Date = Date(),
+    var quantidadeProduto: Int,         // <-- ÚNICO campo para a quantidade
 
-    @JsonProperty("quantidadeProduto")
-    var quantidadeProduto: Int,
+    var sku: String?,                   // <-- ÚNICO campo para o SKU
 
-    @JsonProperty("statusAtivo")
-    var statusAtivo: Boolean
-) {
+    var statusAtivo: Boolean = true,
 
-    constructor() : this(0, Categoria(), "", Date(), 0, true)
+    val dtRegistro: LocalDateTime = LocalDateTime.now(),
+    val quantidade: Int
+){
 
     override fun toString(): String {
         return "Produto(idProduto=$idProduto, categoria=${categoria?.nomeCategoria}, nomeProduto='$nomeProduto', dtRegistro=$dtRegistro, quantidadeProduto=$quantidadeProduto, statusAtivo=$statusAtivo)"

@@ -52,7 +52,7 @@ class ItensSaidaJpaController(
         }
 
         val produto = novoItem.idProduto.let {
-            produtoRepository.findById(it.toInt()).orElseThrow {
+            produtoRepository.findById(it.toInt().toLong()).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }
@@ -113,7 +113,7 @@ class ItensSaidaJpaController(
                 IdNaoEncontradoException("ProdutoCaracteristica", it)            }
         }
         itemAtualizado.idProduto.let {
-            itemExistente.produto = produtoRepository.findById(it.toInt()).orElseThrow {
+            itemExistente.produto = produtoRepository.findById(it.toInt().toLong()).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }
