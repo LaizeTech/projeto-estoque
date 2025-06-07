@@ -32,7 +32,7 @@ class PlataformaProdutoJpaController(
     @PostMapping
     fun create(@RequestBody dto: PlataformaProdutoDTO): ResponseEntity<PlataformaProduto> {
         val plataforma = plataformaRepository.findById(dto.fkPlataforma)
-        val produto = produtoRepository.findById(dto.fkProduto)
+        val produto = produtoRepository.findById(dto.fkProduto.toLong())
         val caracteristica = caracteristicaRepository.findById(dto.fkCaracteristica)
         val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.fkTipoCaracteristica.toLong())
         val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.fkProdutoCaracteristica)
@@ -60,7 +60,7 @@ class PlataformaProdutoJpaController(
         if (existente.isEmpty) return ResponseEntity.status(404).build()
 
         val plataforma = plataformaRepository.findById(dto.fkPlataforma)
-        val produto = produtoRepository.findById(dto.fkProduto)
+        val produto = produtoRepository.findById(dto.fkProduto.toLong())
         val caracteristica = caracteristicaRepository.findById(dto.fkCaracteristica)
         val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.fkTipoCaracteristica.toLong())
         val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.fkProdutoCaracteristica)
