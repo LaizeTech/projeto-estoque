@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class BackLaizeTechApplication
+open class BackLaizeTechApplication
 
 fun main(args: Array<String>) {
 	runApplication<BackLaizeTechApplication>(*args)

@@ -4,5 +4,6 @@ data class ProdutoDTO(
     val idCategoria: Long,
     val nomeProduto: String,
     val quantidadeProduto: Int,
-    val statusAtivo: Boolean
+    val statusAtivo: Boolean,
+    var sku: String?
 )
