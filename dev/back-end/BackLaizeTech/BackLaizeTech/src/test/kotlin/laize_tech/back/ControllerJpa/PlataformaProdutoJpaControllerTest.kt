@@ -89,7 +89,7 @@ class PlataformaProdutoJpaControllerTest {
 
         val response = controller.create(dto)
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
     }
 
     @Test
