@@ -38,4 +38,37 @@ class EmpresaJpaController(val repositorio: EmpresaRepository) {
             ResponseEntity.status(200).body(empresas)
         }
     }
+
+    @PostMapping
+    fun create(@RequestBody empresa: Empresa): ResponseEntity<Empresa> {
+        if (repositorio.existsByCnpj(empresa.cnpj)) {
+            return ResponseEntity.status(409).build()
+        }
+        val novaEmpresa = repositorio.save(empresa)
+        return ResponseEntity.status(201).body(novaEmpresa)
+    }
+
+    @PutMapping("/{id}")
+    fun update(@PathVariable id: Int, @RequestBody empresaAtualizada: Empresa): ResponseEntity<Empresa> {
+        val existente = repositorio.findById(id)
+        return if (existente.isPresent) {
+            val empresa = existente.get().copy(
+                nomeEmpresa = empresaAtualizada.nomeEmpresa,
+                cnpj = empresaAtualizada.cnpj
+            )
+            ResponseEntity.ok(repositorio.save(empresa))
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Int): ResponseEntity<Void> {
+        return if (repositorio.existsById(id)) {
+            repositorio.deleteById(id)
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
 }
