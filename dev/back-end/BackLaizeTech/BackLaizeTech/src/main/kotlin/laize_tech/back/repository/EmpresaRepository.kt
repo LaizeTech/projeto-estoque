@@ -18,4 +18,7 @@ interface EmpresaRepository : JpaRepository<Empresa, Int> {
 
     //Buscar por nome com like (filtro no front)
     fun findByNomeEmpresaContainingIgnoreCase(nome: String): List<Empresa>
+
+    //Verifica se existe empresa com o mesmo CNPJ
+    fun existsByCnpj(cnpj: String): Boolean
 }
