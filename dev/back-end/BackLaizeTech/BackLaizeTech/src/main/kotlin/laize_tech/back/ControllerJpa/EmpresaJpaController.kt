@@ -1,5 +1,6 @@
 package laize_tech.back.ControllerJpa
 
+import laize_tech.back.dto.EmpresaDTO
 import laize_tech.back.repository.EmpresaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -40,13 +41,31 @@ class EmpresaJpaController(val repositorio: EmpresaRepository) {
     }
 
     @PostMapping
-    fun create(@RequestBody empresa: Empresa): ResponseEntity<Empresa> {
-        if (repositorio.existsByCnpj(empresa.cnpj)) {
-            return ResponseEntity.status(409).build()
+    fun create(@RequestBody empresa: EmpresaDTO): ResponseEntity<Any> {
+        // Verifica se nomeEmpresa ou cnpj são nulos ou vazios
+        if (empresa.nomeEmpresa.isNullOrBlank() || empresa.cnpj.isNullOrBlank()) {
+            return ResponseEntity.badRequest().body("Os campos nome e CNPJ não podem estar vazios ou nulos!")
         }
-        val novaEmpresa = repositorio.save(empresa)
-        return ResponseEntity.status(201).body(novaEmpresa)
+
+        // Verifica se o CNPJ já está cadastrado
+        if (repositorio.existsByCnpj(empresa.cnpj)) {
+            return ResponseEntity.status(409).body("Já existe uma empresa cadastrada com esse CNPJ!")
+        }
+
+        return try {
+            val novaEmpresa = Empresa(
+                idEmpresa = null,
+                nomeEmpresa = empresa.nomeEmpresa,
+                cnpj = empresa.cnpj
+            )
+            val empresaSalva = repositorio.save(novaEmpresa)
+            val resposta = EmpresaDTO(empresaSalva.nomeEmpresa, empresaSalva.cnpj)
+            ResponseEntity.status(201).body(resposta)
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body("Erro ao salvar empresa")
+        }
     }
+
 
     @PutMapping("/{id}")
     fun update(@PathVariable id: Int, @RequestBody empresaAtualizada: Empresa): ResponseEntity<Empresa> {
