@@ -8,6 +8,7 @@ import org.mockito.Mockito.*
 import org.springframework.http.HttpStatus
 import java.util.*
 
+// Teste feito pelo Gabriel Gomes Corrêa
 class EmpresaJpaControllerTest {
 
     private lateinit var empresaJpaController: EmpresaJpaController
