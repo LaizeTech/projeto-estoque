@@ -15,7 +15,7 @@ class TipoCaracteristica (
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
 
     var idTipoCaracteristica: Int? = null,
-    var nomeTipoCaracteristica: String = ""
+    var nomeTipoCaracteristica: String? = null
 ) {
     constructor() : this(0, "")
 }

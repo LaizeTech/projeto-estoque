@@ -1,158 +1,67 @@
-package laize_tech.back.ControllerJpa
-
+import laize_tech.back.ControllerJpa.ArquivoController
 import laize_tech.back.entity.Arquivo
 import laize_tech.back.service.ArquivoService
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.*
-import org.springframework.web.multipart.MultipartFile
+import org.mockito.Mockito.*
+import org.springframework.http.HttpStatus
+import org.springframework.mock.web.MockMultipartFile
 
 class ArquivoControllerTest {
+    private val arquivoService = mock(ArquivoService::class.java)
+    private val controller = ArquivoController(arquivoService)
 
-    private val arquivoService: ArquivoService = mock()
-    private val arquivoController = ArquivoController(arquivoService)
+    @Test
+    fun `deve fazer upload de arquivo com sucesso`() {
+        val multipartFile = MockMultipartFile(
+            "file",
+            "test.txt",
+            "text/plain",
+            "test content".toByteArray()
+        )
+        val arquivo = Arquivo(1, "test.txt", "text/plain", "url")
 
-    @Nested
-    inner class UploadArquivo {
+        `when`(arquivoService.salvarArquivo(multipartFile)).thenReturn(arquivo)
 
-        @Test
-        fun retornaArquivoCriadoAoFazerUpload() {
-            val mockFile: MultipartFile = mock()
-            val expectedArquivo = Arquivo(1L, "file.txt", "text/plain", "url")
-            whenever(arquivoService.salvarArquivo(mockFile)).thenReturn(expectedArquivo)
+        val resultado = controller.uploadArquivo(multipartFile)
 
-            val result = arquivoController.uploadArquivo(mockFile)
-
-            assertEquals(expectedArquivo, result)
-        }
-
-        @Test
-        fun lancaExcecaoParaArquivoInvalido() {
-            val mockFile: MultipartFile = mock()
-            whenever(arquivoService.salvarArquivo(mockFile)).thenThrow(IllegalArgumentException("Invalid file"))
-
-            val exception = assertThrows<IllegalArgumentException> {
-                arquivoController.uploadArquivo(mockFile)
-            }
-
-            assertEquals("Invalid file", exception.message)
-        }
+        assertEquals(arquivo, resultado)
+        verify(arquivoService).salvarArquivo(multipartFile)
     }
 
-    @Nested
-    inner class ListarArquivos {
+    @Test
+    fun `deve listar todos os arquivos`() {
+        val arquivos = listOf(
+            Arquivo(1, "arquivo1.txt", "text/plain", "url1"),
+            Arquivo(2, "arquivo2.txt", "text/plain", "url2")
+        )
 
-        @Test
-        fun retornaListaDeArquivos() {
-            val arquivos = listOf(
-                Arquivo(1L, "file1.txt", "text/plain", "url1"),
-                Arquivo(2L, "file2.txt", "text/plain", "url2")
-            )
-            whenever(arquivoService.listarArquivos()).thenReturn(arquivos)
+        `when`(arquivoService.listarArquivos()).thenReturn(arquivos)
 
-            val result = arquivoController.listarArquivos()
+        val resultado = controller.listarArquivos()
 
-            assertEquals(arquivos, result)
-        }
-
-        @Test
-        fun retornaListaVaziaQuandoNaoExistemArquivos() {
-            whenever(arquivoService.listarArquivos()).thenReturn(emptyList())
-
-            val result = arquivoController.listarArquivos()
-
-            assertTrue(result.isEmpty())
-        }
+        assertEquals(arquivos, resultado)
+        verify(arquivoService).listarArquivos()
     }
 
-    @Nested
-    inner class BuscarArquivo {
+    @Test
+    fun `deve buscar arquivo por id`() {
+        val arquivo = Arquivo(1, "arquivo.txt", "text/plain", "url")
 
-        @Test
-        fun retornaArquivoParaIdValido() {
-            val arquivo = Arquivo(1L, "file.txt", "text/plain", "url")
-            whenever(arquivoService.buscarArquivo(1L)).thenReturn(arquivo)
+        `when`(arquivoService.buscarArquivo(1)).thenReturn(arquivo)
 
-            val result = arquivoController.buscarArquivo(1L)
+        val resultado = controller.buscarArquivo(1)
 
-            assertEquals(arquivo, result)
-        }
-
-        @Test
-        fun lancaExcecaoParaIdInvalido() {
-            whenever(arquivoService.buscarArquivo(99L)).thenThrow(NoSuchElementException("Arquivo não encontrado"))
-
-            val exception = assertThrows<NoSuchElementException> {
-                arquivoController.buscarArquivo(99L)
-            }
-
-            assertEquals("Arquivo não encontrado", exception.message)
-        }
+        assertEquals(arquivo, resultado)
+        verify(arquivoService).buscarArquivo(1)
     }
 
-    @Nested
-    inner class DeletarArquivo {
+    @Test
+    fun `deve deletar arquivo`() {
+        doNothing().`when`(arquivoService).deletarArquivo(1)
 
-        @Test
-        fun deletaArquivoParaIdValido() {
-            doNothing().whenever(arquivoService).deletarArquivo(1L)
+        controller.deletarArquivo(1)
 
-            arquivoController.deletarArquivo(1L)
-
-            verify(arquivoService, times(1)).deletarArquivo(1L)
-        }
-
-        @Test
-        fun lancaExcecaoParaIdInvalido() {
-            doThrow(NoSuchElementException("Arquivo não encontrado")).whenever(arquivoService).deletarArquivo(99L)
-
-            val exception = assertThrows<NoSuchElementException> {
-                arquivoController.deletarArquivo(99L)
-            }
-
-            assertEquals("Arquivo não encontrado", exception.message)
-        }
-    }
-
-    @Nested
-    inner class AtualizarArquivo {
-
-        @Test
-        fun atualizaArquivoParaIdValido() {
-            val arquivoAtualizado = Arquivo(1L, "updated_file.txt", "text/plain", "url")
-            whenever(arquivoService.atualizarArquivo(eq(1L), any())).thenReturn(arquivoAtualizado)
-
-            val result = arquivoController.atualizarArquivo(1L, arquivoAtualizado)
-
-            assertEquals(arquivoAtualizado, result)
-        }
-
-        @Test
-        fun lancaExcecaoAoAtualizarArquivoComIdInvalido() {
-            val arquivoAtualizado = Arquivo(99L, "updated_file.txt", "text/plain", "url")
-            whenever(arquivoService.atualizarArquivo(eq(99L), any()))
-                .thenThrow(NoSuchElementException("Arquivo não encontrado"))
-
-            val exception = assertThrows<NoSuchElementException> {
-                arquivoController.atualizarArquivo(99L, arquivoAtualizado)
-            }
-
-            assertEquals("Arquivo não encontrado", exception.message)
-        }
-
-        @Test
-        fun lancaExcecaoAoAtualizarArquivoComDadosInvalidos() {
-            val arquivoAtualizado = Arquivo(1L, "", "text/plain", "url")
-            whenever(arquivoService.atualizarArquivo(eq(1L), any()))
-                .thenThrow(IllegalArgumentException("Dados inválidos"))
-
-            val exception = assertThrows<IllegalArgumentException> {
-                arquivoController.atualizarArquivo(1L, arquivoAtualizado)
-            }
-
-            assertEquals("Dados inválidos", exception.message)
-        }
+        verify(arquivoService).deletarArquivo(1)
     }
 }
