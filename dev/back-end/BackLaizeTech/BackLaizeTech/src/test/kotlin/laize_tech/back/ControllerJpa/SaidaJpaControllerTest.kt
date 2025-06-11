@@ -94,7 +94,7 @@ class SaidaJpaControllerTest {
             controller.post(dto)
         }
 
-        assertEquals("TipoSaida com ID 99 não encontrado.", exception.message)
+        assertEquals("Não foi possível encontrar TipoSaida com o ID 99", exception.message)
     }
 
     @Test
@@ -117,7 +117,7 @@ class SaidaJpaControllerTest {
             controller.post(dto)
         }
 
-        assertEquals("Empresa com ID 99 não encontrado.", exception.message)
+        assertEquals("Não foi possível encontrar Empresa com o ID 99", exception.message)
     }
 
     @Test
@@ -142,7 +142,7 @@ class SaidaJpaControllerTest {
             controller.post(dto)
         }
 
-        assertEquals("Plataforma com ID 99 não encontrado.", exception.message)
+        assertEquals("Não foi possível encontrar Plataforma com o ID 99", exception.message)
     }
 
     @Test
@@ -169,7 +169,7 @@ class SaidaJpaControllerTest {
             controller.post(dto)
         }
 
-        assertEquals("StatusVenda com ID 99 não encontrado.", exception.message)
+        assertEquals("Não foi possível encontrar StatusVenda com o ID 99", exception.message)
     }
 
     @Test

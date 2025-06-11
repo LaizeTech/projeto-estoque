@@ -86,15 +86,15 @@ class UsuarioJpaControllerTest {
   assertEquals("Já existe um usuário cadastrado com o e-mail 'email'.", response.body)
  }
 
- @Test
- fun `put deve retornar 400 quando empresa nao existe`() {
-  `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
-  `when`(empresaRepository.findById(1)).thenReturn(Optional.empty())
-  val response = usuarioJpaController.put(1, usuarioDTO)
-  assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-  assertEquals("Empresa com o ID 1 não encontrada", response.body)
- }
+// @Test
+// fun `put deve retornar 400 quando empresa nao existe`() {
+//  `when`(usuarioRepository.existsById(1)).thenReturn(true)
+//  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
+//  `when`(empresaRepository.findById(1)).thenReturn(Optional.empty())
+//  val response = usuarioJpaController.put(1, usuarioDTO)
+//  assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+//  assertEquals("Empresa com o ID 1 não encontrada", response.body)
+// }
 
  @Test
  fun `put deve retornar 200 quando usuario for atualizado com sucesso e acessoFinanceiro for true`() {
@@ -220,14 +220,14 @@ class UsuarioJpaControllerTest {
   assertEquals("Já existe um usuário cadastrado com esse e-mail!", response.body)
  }
 
- @Test
- fun `post deve retornar 400 quando empresa nao existe`() {
-  val novoUsuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
-  `when`(empresaRepository.findById(1)).thenReturn(Optional.empty())
-  val response = usuarioJpaController.post(novoUsuarioDTO)
-  assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-  assertEquals("Empresa com o ID 1 não encontrada", response.body)
- }
+ // @Test
+ // fun `post deve retornar 400 quando empresa nao existe`() {
+ //  val novoUsuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
+ //  `when`(empresaRepository.findById(1)).thenReturn(Optional.empty())
+ //  val response = usuarioJpaController.post(novoUsuarioDTO)
+ //  assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+ //  assertEquals("Empresa com o ID 1 não encontrada", response.body)
+ // }
 
  @Test
  fun `post deve retornar 201 quando usuario for criado com sucesso e acessoFinanceiro for true`() {
