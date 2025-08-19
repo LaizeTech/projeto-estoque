@@ -47,9 +47,12 @@ class ConfiguracaoAlertasQTDJpaController(
 
     @DeleteMapping("/{id}")
     fun deletar(@PathVariable id: Int): ResponseEntity<Void> {
-        return repositorio.findById(id).map {
-            repositorio.delete(it)
+        val existente = repositorio.findById(id).orElse(null)
+        return if (existente != null) {
+            repositorio.delete(existente)
             ResponseEntity.noContent().build()
-        }.orElse(ResponseEntity.notFound().build())
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 }
