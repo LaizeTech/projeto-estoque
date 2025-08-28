@@ -4,16 +4,17 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "ConfiguracaoAlertasQTD")
-class ConfiguracaoAlertasQTD(
-
+data class ConfiguracaoAlertasQTD(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val idConfiguracaoAlertasQTD: Long? = null,
+    val idConfiguracaoAlertasQTD: Int = 0,
 
-    val quantidadeAmarelo: Int,
-    val quantidadeVermelha: Int,
-    val quantidadeVioleta: Int
+    @Column(nullable = false)
+    val quantidadeAmarelo: Int = 0,
 
-) {
-    constructor() : this(0, 0, 0, 0)
-}
+    @Column(nullable = false)
+    val quantidadeVermelha: Int = 0,
+
+    @Column(nullable = false)
+    val quantidadeVioleta: Int = 0
+)
