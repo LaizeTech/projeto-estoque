@@ -49,6 +49,63 @@ class UsuarioJpaController(
         }
     }
 
+    @PatchMapping("/{id}/alterar-senha")
+    fun alterarSenha(
+        @PathVariable id: Int,
+        @RequestBody payload: Map<String, String>
+    ): ResponseEntity<String> {
+        val novaSenha = payload["novaSenha"]
+        val confirmacaoSenha = payload["confirmacaoSenha"]
+
+        if (novaSenha.isNullOrBlank() || confirmacaoSenha.isNullOrBlank()) {
+            return ResponseEntity.status(400).body("Os campos 'novaSenha' e 'confirmacaoSenha' são obrigatórios.")
+        }
+
+        if (novaSenha != confirmacaoSenha) {
+            return ResponseEntity.status(400).body("A senha e a confirmação de senha não coincidem.")
+        }
+
+        val usuario = repositorio.findById(id).orElse(null)
+            ?: return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+
+        usuario.senha = novaSenha
+
+        return try {
+            repositorio.save(usuario)
+            ResponseEntity.status(200).body("Senha alterada com sucesso.")
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body("Erro ao alterar a senha.")
+        }
+    }
+
+    @PatchMapping("/{id}/alterar-email")
+    fun alterarEmail(
+        @PathVariable id: Int,
+        @RequestBody payload: Map<String, String>
+    ): ResponseEntity<String> {
+        val novoEmail = payload["novoEmail"]
+
+        if (novoEmail.isNullOrBlank()) {
+            return ResponseEntity.status(400).body("O campo 'novoEmail' é obrigatório.")
+        }
+
+        if (repositorio.findAll().any { it.email == novoEmail }) {
+            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '$novoEmail'.")
+        }
+
+        val usuario = repositorio.findById(id).orElse(null)
+            ?: return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+
+        usuario.email = novoEmail
+
+        return try {
+            repositorio.save(usuario)
+            ResponseEntity.status(200).body("E-mail alterado com sucesso.")
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body("Erro ao alterar o e-mail.")
+        }
+    }
+
     @PostMapping("/login")
     fun login(@RequestBody loginDTO: LoginDTO): ResponseEntity<Any> {
         val email = loginDTO.email
