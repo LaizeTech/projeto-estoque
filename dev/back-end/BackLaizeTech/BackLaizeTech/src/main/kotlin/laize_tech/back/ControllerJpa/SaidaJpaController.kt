@@ -15,6 +15,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @RestController
+@CrossOrigin(origins = ["http://localhost:5173"])
 @RequestMapping("/saidas")
 class SaidaJpaController(
     val repositorio: SaidaRepository,
