@@ -72,6 +72,7 @@ class UsuarioJpaController(
         }
 
         val usuarioLogado = LoginResponseDTO(
+            idUsuario = usuario.idUsuario,
             nome = usuario.nome,
             email = usuario.email,
             acessoFinanceiro = usuario.acessoFinanceiro,
