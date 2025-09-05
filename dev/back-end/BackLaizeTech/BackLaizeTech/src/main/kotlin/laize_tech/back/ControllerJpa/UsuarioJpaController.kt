@@ -3,6 +3,7 @@ package laize_tech.back.ControllerJpa
 import jakarta.validation.Valid
 import laize_tech.back.dto.ListagemUsuarioDTO
 import laize_tech.back.dto.LoginDTO
+import laize_tech.back.dto.LoginResponseDTO
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import laize_tech.back.exceptions.IdNaoEncontradoException
@@ -57,18 +58,28 @@ class UsuarioJpaController(
         if (email.isNullOrBlank() || senha.isNullOrBlank()) {
             return ResponseEntity.status(400).body("E-mail e senha são obrigatórios.")
         }
-        val usuario = repositorio.findAll().find { it.email == email && it.senha == senha }
-        return if (usuario != null) {
-            val usuarioLogado = ListagemUsuarioDTO(
-                nome = usuario.nome,
-                email = usuario.email,
-                acessoFinanceiro = usuario.acessoFinanceiro,
-                idEmpresa = usuario.empresa.idEmpresa
-            )
-            ResponseEntity.status(200).body(usuarioLogado)
-        } else {
-            ResponseEntity.status(401).body("E-mail ou senha inválidos.")
+
+        val usuarioOpt = repositorio.findByEmail(email)
+
+        if (usuarioOpt.isEmpty) {
+            return ResponseEntity.status(401).body("E-mail ou senha inválidos.")
         }
+
+        val usuario = usuarioOpt.get()
+
+        if (usuario.senha != senha) {
+            return ResponseEntity.status(401).body("E-mail ou senha inválidos.")
+        }
+
+        val usuarioLogado = LoginResponseDTO(
+            idUsuario = usuario.idUsuario,
+            nome = usuario.nome,
+            email = usuario.email,
+            acessoFinanceiro = usuario.acessoFinanceiro,
+            empresa = usuario.empresa
+        )
+
+        return ResponseEntity.ok(usuarioLogado)
     }
 
     @PutMapping("/{id}")
