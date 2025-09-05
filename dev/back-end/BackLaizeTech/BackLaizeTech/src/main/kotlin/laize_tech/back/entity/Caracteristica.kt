@@ -9,15 +9,16 @@ class Caracteristica (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var id: Int? = null,
+    @Column(name = "id_caracteristica")
+    var idCaracteristica: Int? = null,
+    
+    @Column(name = "nome_caracteristica")
     var nomeCaracteristica: String = "",
 
-
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkTipoCaracteristica", nullable = false)
+    @JoinColumn(name = "id_tipo_caracteristica", nullable = false)
     var tipoCaracteristica: TipoCaracteristica? = null
 
-
 )   {
-    constructor() : this(0, "")
+    constructor() : this(null, "", null)
 }

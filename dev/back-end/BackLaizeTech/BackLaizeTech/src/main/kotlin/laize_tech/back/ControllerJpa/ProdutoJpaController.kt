@@ -7,7 +7,8 @@ import laize_tech.back.entity.Produto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
 import laize_tech.back.repository.ProdutoRepository
-import laize_tech.back.service.UploadService
+import laize_tech.back.service.FileUploadService
+import java.time.LocalDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 class ProdutoJpaController(
     val produtoRepository: ProdutoRepository,
     val categoriaRepository: CategoriaRepository,
-    private val uploadService: UploadService,
+    private val uploadService: FileUploadService,
     private val itensSaidaJpaController: ItensSaidaJpaController,
     saidaJpaController: ItensSaidaJpaController
 ) {
@@ -48,10 +49,9 @@ class ProdutoJpaController(
             // A quantidade DEVE vir do DTO nesta função.
             quantidadeProduto = novoProdutoDTO.quantidadeProduto,
 
-            sku = novoProdutoDTO.sku,
+            caminhoImagem = novoProdutoDTO.caminhoImagem,
             statusAtivo = novoProdutoDTO.statusAtivo,
-            dtRegistro = TODO(),
-            quantidade = novoProdutoDTO.quantidadeProduto,
+            dtRegistro = LocalDateTime.now()
         )
 
         val produtoSalvo = produtoRepository.save(novoProduto)
@@ -60,10 +60,9 @@ class ProdutoJpaController(
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long): ResponseEntity<String> {
-        val idInt = id.toInt()
-        if (produtoRepository.existsById(idInt.toLong())) {
-            produtoRepository.deleteById(idInt.toLong())
+    fun delete(@PathVariable id: Int): ResponseEntity<String> {
+        if (produtoRepository.existsById(id)) {
+            produtoRepository.deleteById(id)
             return ResponseEntity.status(204).build()
         }
         val mensagem = "Não foi possível deletar o produto com id $id"
@@ -72,7 +71,7 @@ class ProdutoJpaController(
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody produtoAtualizadoDTO: ProdutoDTO): ResponseEntity<Any> {
-        val produtoExistente = produtoRepository.findById(id.toLong()).orElseThrow {
+        val produtoExistente = produtoRepository.findById(id).orElseThrow {
             IdNaoEncontradoException("Produto", id)
         }
 

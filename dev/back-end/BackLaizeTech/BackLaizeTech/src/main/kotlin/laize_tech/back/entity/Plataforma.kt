@@ -8,15 +8,16 @@ class Plataforma(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idPlataforma")
+    @Column(name = "id_plataforma")
     var idPlataforma: Int? = null,
 
+    @Column(name = "nome_plataforma")
     var nomePlataforma: String? = null,
 
     var status: Boolean? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkEmpresa")
+    @JoinColumn(name = "id_empresa")
     var empresa: Empresa? = null
 
 ) {

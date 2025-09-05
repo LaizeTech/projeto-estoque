@@ -11,7 +11,8 @@ import laize_tech.back.repository.PlataformaRepository
 import laize_tech.back.repository.StatusVendaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/saidas")
@@ -52,15 +53,17 @@ class SaidaJpaController(
             IdNaoEncontradoException("StatusVenda", novaSaidaDTO.idStatusVenda)
         }
 
-        val dtVenda: LocalDate = novaSaidaDTO.dtVenda?.let { LocalDate.parse(it) } ?: LocalDate.now()
+        val dtVenda: LocalDateTime = novaSaidaDTO.dtVenda?.let { 
+            LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) 
+        } ?: LocalDateTime.now()
 
         val novaSaida = Saida(
             tipoSaida = tipoSaida,
             empresa = empresa,
             plataforma = plataforma,
+            numeroPedido = novaSaidaDTO.numeroPedido,
             dtVenda = dtVenda,
             precoVenda = novaSaidaDTO.precoVenda,
-            totalTaxa = novaSaidaDTO.totalTaxa,
             totalDesconto = novaSaidaDTO.totalDesconto,
             statusVenda = statusVenda
         )
@@ -94,9 +97,11 @@ class SaidaJpaController(
         saidaExistente.tipoSaida = tipoSaida
         saidaExistente.empresa = empresa
         saidaExistente.plataforma = plataforma
-        saidaExistente.dtVenda = saidaAtualizadaDTO.dtVenda?.let { LocalDate.parse(it) } ?: saidaExistente.dtVenda
+        saidaExistente.numeroPedido = saidaAtualizadaDTO.numeroPedido ?: saidaExistente.numeroPedido
+        saidaExistente.dtVenda = saidaAtualizadaDTO.dtVenda?.let { 
+            LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) 
+        } ?: saidaExistente.dtVenda
         saidaExistente.precoVenda = saidaAtualizadaDTO.precoVenda ?: saidaExistente.precoVenda
-        saidaExistente.totalTaxa = saidaAtualizadaDTO.totalTaxa ?: saidaExistente.totalTaxa
         saidaExistente.totalDesconto = saidaAtualizadaDTO.totalDesconto ?: saidaExistente.totalDesconto
         saidaExistente.statusVenda = statusVenda
 

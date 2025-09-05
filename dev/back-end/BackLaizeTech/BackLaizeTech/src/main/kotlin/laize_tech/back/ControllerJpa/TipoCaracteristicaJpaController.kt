@@ -19,7 +19,7 @@ class TipoCaracteristicaJpaController (
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody @Valid tipoCaracteristica: TipoCaracteristica): ResponseEntity<TipoCaracteristica> {
+    fun update(@PathVariable id: Int, @RequestBody @Valid tipoCaracteristica: TipoCaracteristica): ResponseEntity<TipoCaracteristica> {
         val existingTipoCaracteristica = tipoCaracteristicaRepository.findById(id)
         return if (existingTipoCaracteristica.isPresent) {
             val updatedTipoCaracteristica = existingTipoCaracteristica.get()
@@ -42,7 +42,7 @@ class TipoCaracteristicaJpaController (
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long): ResponseEntity<Void> {
+    fun delete(@PathVariable id: Int): ResponseEntity<Void> {
         return if (tipoCaracteristicaRepository.existsById(id)) {
             tipoCaracteristicaRepository.deleteById(id)
             ResponseEntity.noContent().build()

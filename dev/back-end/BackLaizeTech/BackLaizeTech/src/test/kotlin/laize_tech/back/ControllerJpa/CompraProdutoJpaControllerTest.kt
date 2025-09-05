@@ -1,3 +1,5 @@
+package laize_tech.back.ControllerJpa
+
 import laize_tech.back.ControllerJpa.CompraProdutoJpaController
 import laize_tech.back.dto.CompraProdutoDTO
 import laize_tech.back.entity.Categoria
@@ -7,14 +9,44 @@ import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CompraProdutoRepository
 import laize_tech.back.repository.ProdutoRepository
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
 class CompraProdutoJpaControllerTest {
+
+    private val compraProdutoRepository = mock(CompraProdutoRepository::class.java)
+    private val produtoRepository = mock(ProdutoRepository::class.java)
+    private val controller = CompraProdutoJpaController(compraProdutoRepository, produtoRepository)
+
+    @BeforeEach
+    fun configurar() {
+        val categoria = Categoria(1, "Categoria Teste")
+        val produto = Produto(
+            idProduto = 1,
+            categoria = categoria,
+            nomeProduto = "Produto Teste",
+            quantidadeProduto = 50,
+            statusAtivo = true,
+            caminhoImagem = null,
+            dtRegistro = LocalDateTime.now()
+        )
+
+        val compraProduto = listOf(
+            CompraProduto(
+                idCompraProduto = 1,
+                fornecedor = "fornecedor teste",
+                precoCompra = BigDecimal("10.50"),
+                dtCompra = LocalDateTime.now(),
+                quantidadeProduto = 10,
+                produto = produto
+            )
+        )
 
     private val compraProdutoRepository = mock(CompraProdutoRepository::class.java)
     private val produtoRepository = mock(ProdutoRepository::class.java)
@@ -25,10 +57,9 @@ class CompraProdutoJpaControllerTest {
         categoria = Categoria(1, "Categoria Test"),
         nomeProduto = "Produto Test",
         quantidadeProduto = 100,
-        sku = "SKU123",
+        caminhoImagem = "/images/produto-test.jpg",
         statusAtivo = true,
-        dtRegistro = LocalDateTime.now(),
-        quantidade = 50
+        dtRegistro = LocalDateTime.now()
     )
 
     @Test

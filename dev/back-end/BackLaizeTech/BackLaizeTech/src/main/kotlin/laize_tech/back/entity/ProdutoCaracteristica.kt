@@ -9,23 +9,23 @@ data class ProdutoCaracteristica (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idProdutoCaracteristica")
+    @Column(name = "id_produto_caracteristica")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idProdutoCaracteristica: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name = "caracteristica_id")
+    @JoinColumn(name = "id_caracteristica")
     var caracteristica: Caracteristica? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fkTipoCaracteristica")
+    @JoinColumn(name = "id_tipo_caracteristica")
     var tipoCaracteristica: TipoCaracteristica? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fkProduto")
+    @JoinColumn(name = "id_produto")
     var produto: Produto? = null,
 
-    @Column(name = "quantidadeProdutoCaracteristica")
+    @Column(name = "quantidade_produto_caracteristica")
     var quantidadeProdutoCaracteristica: Int? = null
 ) {
     constructor() : this(null, null, null, null, null)

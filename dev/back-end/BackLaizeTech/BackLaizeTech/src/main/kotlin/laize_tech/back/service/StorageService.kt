@@ -1,5 +1,6 @@
 package laize_tech.back.service
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -10,6 +11,7 @@ import java.net.URL
 import java.nio.file.Paths
 
 @Service
+@ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "true", matchIfMissing = false)
 class StorageService {
     private val s3 = S3Client.builder()
         .region(Region.US_EAST_1) // região do bucket S3

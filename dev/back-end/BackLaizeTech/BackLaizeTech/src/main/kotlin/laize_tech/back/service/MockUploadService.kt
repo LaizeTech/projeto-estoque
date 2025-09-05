@@ -1,56 +1,29 @@
 package laize_tech.back.service
 
-
 import laize_tech.back.entity.Produto
 import laize_tech.back.repository.ProdutoRepository
 import com.opencsv.CSVReaderBuilder
 import laize_tech.back.entity.Categoria
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.io.InputStreamReader
 import java.time.Instant
 
 @Service
-@ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "true", matchIfMissing = false)
-class UploadService(
-    @Autowired(required = false) private val s3Client: S3Client?,
-    private val produtoRepository: ProdutoRepository,
-    @Value("\${aws.s3.bucket-name:}") private val bucketName: String
+@ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "false", matchIfMissing = true)
+class MockUploadService(
+    private val produtoRepository: ProdutoRepository
 ) : FileUploadService {
 
     override fun uploadFileAndProcess(file: MultipartFile): List<Produto> {
-        // 1. Fazer o upload do arquivo original para o S3 (se disponível)
-        if (s3Client != null && bucketName.isNotBlank()) {
-            val fileKey = "uploads/${Instant.now().epochSecond}_${file.originalFilename}"
-            uploadToS3(fileKey, file)
-        }
-
-        // 2. Ler o arquivo e processar os dados (exemplo para CSV)
+        println("🔧 Modo de desenvolvimento: Processando arquivo sem S3 - ${file.originalFilename}")
+        
+        // Apenas processar os dados do CSV sem enviar para S3
         val produtos = parseCsvAndCreateProducts(file)
 
-        // 3. Salvar os produtos no banco de dados (parte do CRUD)
+        // Salvar os produtos no banco de dados
         return produtoRepository.saveAll(produtos)
-    }
-
-    private fun uploadToS3(key: String, file: MultipartFile) {
-        if (s3Client == null) {
-            println("S3 não está configurado. Arquivo não será enviado para o S3: ${file.originalFilename}")
-            return
-        }
-        
-        val putObjectRequest = PutObjectRequest.builder()
-            .bucket(bucketName)
-            .key(key)
-            .build()
-
-        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.inputStream, file.size))
     }
 
     private fun parseCsvAndCreateProducts(file: MultipartFile): List<Produto> {

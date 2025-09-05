@@ -22,9 +22,9 @@ class ArquivoController(
     fun listarArquivos(): List<Arquivo> = arquivoService.listarArquivos()
 
     @GetMapping("/{id}")
-    fun buscarArquivo(@PathVariable id: Long): Arquivo = arquivoService.buscarArquivo(id)
+    fun buscarArquivo(@PathVariable id: Int): Arquivo = arquivoService.buscarArquivo(id)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deletarArquivo(@PathVariable id: Long) = arquivoService.deletarArquivo(id)
+    fun deletarArquivo(@PathVariable id: Int) = arquivoService.deletarArquivo(id)
 }

@@ -33,7 +33,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 404 quando usuario nao existe`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(false)
-  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
+  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, true, 1)
   val response = usuarioJpaController.put(1, usuarioDTO)
   assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
   assertEquals("Usuário com o ID 1 não encontrado.", response.body)
@@ -42,7 +42,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 400 quando nome for nulo ou vazio`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO(null, "email", "senha", true, 1)
+  val usuarioDTO = UsuarioDTO(null, "email", "senha", true, true, 1)
   val response = usuarioJpaController.put(1, usuarioDTO)
   assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
   assertEquals("Os campos nome, senha e email não podem estar vazios ou nulos!", response.body)
@@ -51,7 +51,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 400 quando senha for nula ou vazia`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO("nome", "email", null, true, 1)
+  val usuarioDTO = UsuarioDTO("nome", "email", null, true, true, 1)
   val response = usuarioJpaController.put(1, usuarioDTO)
   assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
   assertEquals("Os campos nome, senha e email não podem estar vazios ou nulos!", response.body)
@@ -60,7 +60,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 400 quando email for nulo ou vazio`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO("nome", null, "senha", true, 1)
+  val usuarioDTO = UsuarioDTO("nome", null, "senha", true, true, 1)
   val response = usuarioJpaController.put(1, usuarioDTO)
   assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
   assertEquals("Os campos nome, senha e email não podem estar vazios ou nulos!", response.body)
@@ -69,7 +69,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 400 quando idEmpresa for nulo`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, null)
+  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, true, null)
   val response = usuarioJpaController.put(1, usuarioDTO)
   assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
  }
@@ -77,7 +77,7 @@ class UsuarioJpaControllerTest {
  @Test
  fun `put deve retornar 409 quando email ja existe para outro usuario`() {
   `when`(usuarioRepository.existsById(1)).thenReturn(true)
-  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, 1)
+  val usuarioDTO = UsuarioDTO("nome", "email", "senha", true, true, 1)
   val empresa = Empresa(1, "nome", "cnpj")
   val usuarioExistente = Usuario(2, "outro", "email", "senha", true, empresa)
   `when`(usuarioRepository.findAll()).thenReturn(listOf(usuarioExistente))

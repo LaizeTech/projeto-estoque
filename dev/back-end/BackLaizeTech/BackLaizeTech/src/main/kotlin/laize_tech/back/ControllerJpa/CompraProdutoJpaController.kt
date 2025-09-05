@@ -9,7 +9,7 @@ import laize_tech.back.repository.CompraProdutoRepository
 import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/compras")
@@ -35,7 +35,7 @@ class CompraProdutoJpaController(
 //        }
 
         val produto = compraProdutoDTO.idProduto.let {
-            produtoRepository.findById(it.toLong()).orElseThrow {
+            produtoRepository.findById(it).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }
@@ -43,7 +43,7 @@ class CompraProdutoJpaController(
         val novaCompra = CompraProduto(
             fornecedor = compraProdutoDTO.fornecedor,
             precoCompra = compraProdutoDTO.precoCompra,
-            dtCompra = compraProdutoDTO.dtCompra ?: LocalDate.now(),
+            dtCompra = compraProdutoDTO.dtCompra ?: LocalDateTime.now(),
             quantidadeProduto = compraProdutoDTO.quantidadeProduto,
             produto = produto
         )

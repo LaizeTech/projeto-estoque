@@ -5,7 +5,7 @@ import jakarta.persistence.*
 @Entity
 data class Arquivo(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Int = 0,
 
     val nomeOriginal: String,
 

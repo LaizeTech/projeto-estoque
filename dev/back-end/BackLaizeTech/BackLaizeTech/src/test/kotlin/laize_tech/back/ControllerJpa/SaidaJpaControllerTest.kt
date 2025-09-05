@@ -52,9 +52,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 1,
             idPlataforma = 1,
+            numeroPedido = "PED-001",
             dtVenda = "2023-08-20",
             precoVenda = 14.99,
-            totalTaxa = 100.0,
             totalDesconto = 10.0,
             idStatusVenda = 1
         )
@@ -62,7 +62,7 @@ class SaidaJpaControllerTest {
         val empresa = Empresa(1, "Empresa A", "12345678901234")
         val plataforma = Plataforma(1, "Plataforma A", true, empresa)
         val statusVenda = StatusVenda(1, "Aprovado")
-        val saida = Saida(null, tipoSaida, empresa, plataforma, LocalDate.parse("2023-08-20"), 14.99, 100.0, 10.0, statusVenda)
+        val saida = Saida(null, tipoSaida, empresa, plataforma, "PED-001", LocalDate.parse("2023-08-20"), 14.99, 10.0, statusVenda)
 
         `when`(tipoSaidaRepository.findById(1)).thenReturn(Optional.of(tipoSaida))
         `when`(empresaRepository.findById(1)).thenReturn(Optional.of(empresa))
@@ -82,9 +82,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 99,
             idEmpresa = 1,
             idPlataforma = 1,
+            numeroPedido = "PED-002",
             dtVenda = "2023-11-13",
             precoVenda = 32.99,
-            totalTaxa = 100.0,
             totalDesconto = 10.0,
             idStatusVenda = 1
         )
@@ -103,9 +103,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 99,
             idPlataforma = 1,
+            numeroPedido = "PED-003",
             dtVenda = "2023-06-02",
             precoVenda = 180.45,
-            totalTaxa = 100.0,
             totalDesconto = 10.0,
             idStatusVenda = 1
         )
@@ -126,9 +126,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 1,
             idPlataforma = 99,
+            numeroPedido = "PED-004",
             dtVenda = "2023-09-02",
             precoVenda = 23.4,
-            totalTaxa = 100.0,
             totalDesconto = 10.0,
             idStatusVenda = 1
         )
@@ -151,9 +151,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 1,
             idPlataforma = 1,
+            numeroPedido = "PED-005",
             dtVenda = "2023-10-01",
             precoVenda = 17.99,
-            totalTaxa = 100.0,
             totalDesconto = 10.0,
             idStatusVenda = 99
         )
@@ -179,9 +179,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 1,
             idPlataforma = 1,
+            numeroPedido = "PED-006",
             dtVenda = "2023-09-02",
             precoVenda = 80.5,
-            totalTaxa = 150.0,
             totalDesconto = 15.0,
             idStatusVenda = 1
         )
@@ -189,7 +189,7 @@ class SaidaJpaControllerTest {
         val empresa = Empresa(1, "Empresa A", "12345678901234")
         val plataforma = Plataforma(1, "Plataforma A", true, empresa)
         val statusVenda = StatusVenda(1, "Aprovado")
-        val saidaExistente = Saida(id, tipoSaida, empresa, plataforma, LocalDate.parse("2023-09-01"), 80.5, 150.0, 15.0, statusVenda)
+        val saidaExistente = Saida(id, tipoSaida, empresa, plataforma, "PED-006", LocalDate.parse("2023-09-01"), 80.5, 15.0, statusVenda)
 
         `when`(saidaRepository.findById(id)).thenReturn(Optional.of(saidaExistente))
         `when`(tipoSaidaRepository.findById(1)).thenReturn(Optional.of(tipoSaida))
@@ -211,9 +211,9 @@ class SaidaJpaControllerTest {
             idTipoSaida = 1,
             idEmpresa = 1,
             idPlataforma = 1,
+            numeroPedido = "PED-007",
             dtVenda = "2023-10-01",
             precoVenda = 25.5,
-            totalTaxa = 150.0,
             totalDesconto = 15.0,
             idStatusVenda = 1
         )

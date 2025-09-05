@@ -39,6 +39,7 @@ class UsuarioJpaController(
             email = novoUsuarioDTO.email,
             senha = novoUsuarioDTO.senha,
             acessoFinanceiro = novoUsuarioDTO.acessoFinanceiro ?: false,
+            statusAtivo = novoUsuarioDTO.statusAtivo ?: true,
             empresa = empresa
         )
         return try {
@@ -63,6 +64,7 @@ class UsuarioJpaController(
                 nome = usuario.nome,
                 email = usuario.email,
                 acessoFinanceiro = usuario.acessoFinanceiro,
+                statusAtivo = usuario.statusAtivo,
                 idEmpresa = usuario.empresa.idEmpresa
             )
             ResponseEntity.status(200).body(usuarioLogado)
@@ -72,8 +74,8 @@ class UsuarioJpaController(
     }
 
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Long, @RequestBody @Valid usuarioDTO: UsuarioDTO): ResponseEntity<Any> {
-        if (!repositorio.existsById(id.toInt())) {
+    fun put(@PathVariable id: Int, @RequestBody @Valid usuarioDTO: UsuarioDTO): ResponseEntity<Any> {
+        if (!repositorio.existsById(id)) {
             return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
         }
 
@@ -95,6 +97,7 @@ class UsuarioJpaController(
         usuarioExistente.email = usuarioDTO.email
         usuarioExistente.senha = usuarioDTO.senha
         usuarioExistente.acessoFinanceiro = usuarioDTO.acessoFinanceiro ?: false
+        usuarioExistente.statusAtivo = usuarioDTO.statusAtivo ?: usuarioExistente.statusAtivo
         usuarioExistente.empresa = empresa
 
         return try {
@@ -123,6 +126,7 @@ class UsuarioJpaController(
                 nome = usuario.nome,
                 email = usuario.email,
                 acessoFinanceiro = usuario.acessoFinanceiro,
+                statusAtivo = usuario.statusAtivo,
                 idEmpresa = usuario.empresa.idEmpresa
             )
             listagemUsuarios.add(listagemUsuario)
@@ -143,6 +147,7 @@ class UsuarioJpaController(
                 nome = usuarioEncontrado.nome,
                 email = usuarioEncontrado.email,
                 acessoFinanceiro = usuarioEncontrado.acessoFinanceiro,
+                statusAtivo = usuarioEncontrado.statusAtivo,
                 idEmpresa = usuarioEncontrado.empresa.idEmpresa
             )
             ResponseEntity.status(200).body(listagemUsuario)
@@ -159,6 +164,7 @@ class UsuarioJpaController(
                 nome = usuario.nome,
                 email = usuario.email,
                 acessoFinanceiro = usuario.acessoFinanceiro,
+                statusAtivo = usuario.statusAtivo,
                 idEmpresa = usuario.empresa.idEmpresa
             )
         }
@@ -177,6 +183,7 @@ class UsuarioJpaController(
                 nome = usuario.nome,
                 email = usuario.email,
                 acessoFinanceiro = usuario.acessoFinanceiro,
+                statusAtivo = usuario.statusAtivo,
                 idEmpresa = usuario.empresa.idEmpresa
             )
         }

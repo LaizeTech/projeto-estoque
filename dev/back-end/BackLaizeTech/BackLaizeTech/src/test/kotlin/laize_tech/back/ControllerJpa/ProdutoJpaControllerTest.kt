@@ -6,7 +6,7 @@ import laize_tech.back.entity.Produto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
 import laize_tech.back.repository.ProdutoRepository
-import laize_tech.back.service.UploadService
+import laize_tech.back.service.FileUploadService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -19,7 +19,7 @@ class ProdutoJpaControllerTest {
 
     private val produtoRepository = mock(ProdutoRepository::class.java)
     private val categoriaRepository = mock(CategoriaRepository::class.java)
-    private val uploadService = mock(UploadService::class.java)
+    private val uploadService = mock(FileUploadService::class.java)
     private val itensSaidaJpaController = mock(ItensSaidaJpaController::class.java)
     private val controller = ProdutoJpaController(
         produtoRepository,
@@ -37,20 +37,18 @@ class ProdutoJpaControllerTest {
                 categoria = Categoria(),
                 nomeProduto = "Produto 1",
                 quantidadeProduto = 10,
-                sku = "SKU1",
+                caminhoImagem = "/images/produto1.jpg",
                 statusAtivo = true,
-                dtRegistro = LocalDateTime.now(),
-                quantidade = 10
+                dtRegistro = LocalDateTime.now()
             ),
             Produto(
                 idProduto = 2L,
                 categoria = Categoria(),
                 nomeProduto = "Produto 2",
                 quantidadeProduto = 20,
-                sku = "SKU2",
+                caminhoImagem = "/images/produto2.jpg",
                 statusAtivo = true,
-                dtRegistro = LocalDateTime.now(),
-                quantidade = 20
+                dtRegistro = LocalDateTime.now()
             )
         )
         `when`(produtoRepository.findAll()).thenReturn(produtos)
@@ -77,7 +75,7 @@ class ProdutoJpaControllerTest {
             idCategoria = 99L,
             nomeProduto = "Novo Produto",
             quantidadeProduto = 10,
-            sku = "SKU123",
+            caminhoImagem = "/images/novo-produto.jpg",
             statusAtivo = true
         )
 
@@ -97,7 +95,7 @@ class ProdutoJpaControllerTest {
             idCategoria = 1L,
             nomeProduto = "Produto Atualizado",
             quantidadeProduto = 20,
-            sku = "SKU456",
+            caminhoImagem = "/images/produto-atualizado.jpg",
             statusAtivo = true
         )
         val categoria = Categoria(1, "Categoria Test")
@@ -106,18 +104,17 @@ class ProdutoJpaControllerTest {
             categoria = categoria,
             nomeProduto = "Produto Original",
             quantidadeProduto = 10,
-            sku = "SKU123",
+            caminhoImagem = "/images/produto-original.jpg",
             statusAtivo = true,
-            dtRegistro = LocalDateTime.now(),
-            quantidade = 10
+            dtRegistro = LocalDateTime.now()
         )
 
-        `when`(produtoRepository.findById(id.toLong())).thenReturn(Optional.of(produtoExistente))
+        `when`(produtoRepository.findById(id)).thenReturn(Optional.of(produtoExistente))
         `when`(categoriaRepository.findById(1)).thenReturn(Optional.of(categoria))
         `when`(produtoRepository.save(any())).thenReturn(produtoExistente.copy(
             nomeProduto = "Produto Atualizado",
             quantidadeProduto = 20,
-            sku = "SKU456"
+            caminhoImagem = "/images/produto-atualizado.jpg"
         ))
 
         val response = controller.put(id, dto)
@@ -133,7 +130,7 @@ class ProdutoJpaControllerTest {
             idCategoria = 1L,
             nomeProduto = "",
             quantidadeProduto = 20,
-            sku = "SKU456",
+            caminhoImagem = "/images/produto-teste.jpg",
             statusAtivo = true
         )
         val produtoExistente = Produto(
@@ -141,13 +138,12 @@ class ProdutoJpaControllerTest {
             categoria = Categoria(),
             nomeProduto = "Produto Original",
             quantidadeProduto = 10,
-            sku = "SKU123",
+            caminhoImagem = "/images/produto-original2.jpg",
             statusAtivo = true,
-            dtRegistro = LocalDateTime.now(),
-            quantidade = 10
+            dtRegistro = LocalDateTime.now()
         )
 
-        `when`(produtoRepository.findById(id.toLong())).thenReturn(Optional.of(produtoExistente))
+        `when`(produtoRepository.findById(id)).thenReturn(Optional.of(produtoExistente))
 
         val response = controller.put(id, dto)
 
@@ -191,10 +187,9 @@ class ProdutoJpaControllerTest {
                 categoria = Categoria(),
                 nomeProduto = "Produto 1",
                 quantidadeProduto = 10,
-                sku = "SKU1",
+                caminhoImagem = "/images/upload-produto1.jpg",
                 statusAtivo = true,
-                dtRegistro = LocalDateTime.now(),
-                quantidade = 10
+                dtRegistro = LocalDateTime.now()
             )
         )
 

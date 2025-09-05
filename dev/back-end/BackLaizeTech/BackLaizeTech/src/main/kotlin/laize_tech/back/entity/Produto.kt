@@ -8,22 +8,26 @@ import java.time.LocalDateTime
 data class Produto(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val idProduto: Long = 0,             // <-- ÚNICO campo para o ID
+    @Column(name = "id_produto")
+    val idProduto: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "fk_categoria")
+    @JoinColumn(name = "id_categoria")
     var categoria: Categoria?,
 
-    var nomeProduto: String?,            // <-- ÚNICO campo para o nome
+    @Column(name = "nome_produto")
+    var nomeProduto: String?,
 
-    var quantidadeProduto: Int,         // <-- ÚNICO campo para a quantidade
+    @Column(name = "quantidade_produto")
+    var quantidadeProduto: Int,
 
-    var sku: String?,                   // <-- ÚNICO campo para o SKU
-
+    @Column(name = "status_ativo")
     var statusAtivo: Boolean = true,
 
-    val dtRegistro: LocalDateTime = LocalDateTime.now(),
-    val quantidade: Int
+    @Column(name = "caminho_imagem")
+    var caminhoImagem: String?,
+
+    val dtRegistro: LocalDateTime = LocalDateTime.now()
 ){
 
     override fun toString(): String {
