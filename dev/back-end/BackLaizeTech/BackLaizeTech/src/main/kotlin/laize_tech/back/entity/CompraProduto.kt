@@ -17,7 +17,7 @@ data class CompraProduto(
     var quantidadeProduto: Int = 0,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkProduto") var produto: Produto?
+    @JoinColumn(name = "id_produto") var produto: Produto?
 ) {
     constructor() : this(null,"",0.0,null,0,null)
 }

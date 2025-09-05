@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.time.LocalDate
 
-interface ProdutoRepository : JpaRepository<Produto, Long> {
+interface ProdutoRepository : JpaRepository<Produto, Int> {
 
 //    @Transactional
 //    @Modifying

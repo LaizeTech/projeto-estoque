@@ -49,7 +49,7 @@ class CaracteristicaJpaControllerTest {
             nomeCaracteristica = "Nova Caracteristica"
         )
         val caracteristicaSalva = Caracteristica(
-            id = 1,
+            idCaracteristica = 1,
             nomeCaracteristica = dto.nomeCaracteristica,
             tipoCaracteristica = tipoCaracteristica
         )

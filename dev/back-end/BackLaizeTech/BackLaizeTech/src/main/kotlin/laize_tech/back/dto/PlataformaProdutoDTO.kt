@@ -1,10 +1,10 @@
 package laize_tech.back.dto
 
 data class PlataformaProdutoDTO(
-val fkPlataforma: Int,
-val fkProdutoCaracteristica: Int,
-val fkCaracteristica: Int,
-val fkTipoCaracteristica: Int,
-val fkProduto: Int,
-val quantidadeProdutoPlataforma: Int
+val id_plataforma: Int,
+val id_produto_caracteristica: Int,
+val id_caracteristica: Int,
+val id_tipo_caracteristica: Int,
+val id_produto: Int,
+val quantidade_produto_plataforma: Int
 )

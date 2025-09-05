@@ -62,8 +62,8 @@ class ProdutoJpaController(
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<String> {
         val idInt = id.toInt()
-        if (produtoRepository.existsById(idInt.toLong())) {
-            produtoRepository.deleteById(idInt.toLong())
+        if (produtoRepository.existsById(idInt)) {
+            produtoRepository.deleteById(idInt)
             return ResponseEntity.status(204).build()
         }
         val mensagem = "Não foi possível deletar o produto com id $id"
@@ -72,7 +72,7 @@ class ProdutoJpaController(
 
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody produtoAtualizadoDTO: ProdutoDTO): ResponseEntity<Any> {
-        val produtoExistente = produtoRepository.findById(id.toLong()).orElseThrow {
+        val produtoExistente = produtoRepository.findById(id).orElseThrow {
             IdNaoEncontradoException("Produto", id)
         }
 

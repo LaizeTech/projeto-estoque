@@ -16,7 +16,7 @@ class Plataforma(
     var status: Boolean? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkEmpresa")
+    @JoinColumn(name = "id_empresa")
     var empresa: Empresa? = null
 
 ) {

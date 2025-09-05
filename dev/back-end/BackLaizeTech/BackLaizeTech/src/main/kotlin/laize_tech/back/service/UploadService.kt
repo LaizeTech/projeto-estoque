@@ -69,5 +69,5 @@ class UploadService(
 
     // Métodos CRUD básicos
     fun findAll(): List<Produto> = produtoRepository.findAll()
-    fun findById(id: Long): Produto? = produtoRepository.findById(id).orElse(null)
+    fun findById(id: Long): Produto? = produtoRepository.findById(id.toInt()).orElse(null)
 }

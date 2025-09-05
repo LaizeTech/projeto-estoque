@@ -9,28 +9,28 @@ class PlataformaProduto(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idPlataformaProduto")
+    @Column(name = "id_plataforma_produto")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idPlataformaProduto: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkPlataforma")
+    @JoinColumn(name = "id_plataforma")
     var plataforma: Plataforma? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkProdutoCaracteristica")
+    @JoinColumn(name = "id_produtoCaracteristica")
     var produtoCaracteristica: ProdutoCaracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkCaracteristica")
+    @JoinColumn(name = "id_caracteristica")
     var caracteristica: Caracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkTipoCaracteristica")
+    @JoinColumn(name = "id_tipo_caracteristica")
     var tipoCaracteristica: TipoCaracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkProduto")
+    @JoinColumn(name = "id_produto")
     var produto: Produto? = null,
 
     var quantidadeProdutoPlataforma: Int? = null

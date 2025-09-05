@@ -11,15 +11,15 @@ class ItensSaida(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var idItem: Int? = null,
+    var id_item: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkSaida")
+    @JoinColumn(name = "id_saida")
     @NotNull
     var saida: Saida? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkPlataforma")
+    @JoinColumn(name = "id_plataforma")
     @NotNull
     var plataforma: Plataforma? = null,
 
@@ -28,19 +28,19 @@ class ItensSaida(
     var quantidade: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkTipoCaracteristica")
+    @JoinColumn(name = "id_tipo_caracteristica")
     var tipoCaracteristica: TipoCaracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkCaracteristica")
+    @JoinColumn(name = "id_caracteristica")
     var caracteristica: Caracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkProdutoCaracteristica")
+    @JoinColumn(name = "id_produto_caracteristica")
     var produtoCaracteristica: ProdutoCaracteristica? = null,
 
     @ManyToOne
-    @JoinColumn(name = "fkProduto")
+    @JoinColumn(name = "id_produto")
     @NotNull
     var produto: Produto? = null
 ) {

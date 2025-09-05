@@ -35,7 +35,7 @@ class CompraProdutoJpaController(
 //        }
 
         val produto = compraProdutoDTO.idProduto.let {
-            produtoRepository.findById(it.toLong()).orElseThrow {
+            produtoRepository.findById(it).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }

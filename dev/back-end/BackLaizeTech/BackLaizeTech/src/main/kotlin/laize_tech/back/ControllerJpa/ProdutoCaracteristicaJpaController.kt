@@ -34,7 +34,7 @@ class ProdutoCaracteristicaJpaController(
 
     @GetMapping("/caracteristica/{codigo}")
     fun getProdutoPorCaracteristica(@PathVariable codigo: Int): ResponseEntity<List<ProdutoCaracteristica>> {
-        val produtoCaracteristica = repositorio.findByCaracteristica_Id(codigo)
+        val produtoCaracteristica = repositorio.findByCaracteristica_IdCaracteristica(codigo)
 
         if (produtoCaracteristica.isEmpty()) {
             throw IdNaoEncontradoException("Caracteristica", codigo)
@@ -46,7 +46,7 @@ class ProdutoCaracteristicaJpaController(
     @PostMapping
     fun post(@RequestBody novoProduto: ProdutoCaracteristicaDTO): ResponseEntity<ProdutoCaracteristica> {
         val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
-            tipoCaracteristicaRepository.findById(it).orElseThrow {
+            tipoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
@@ -57,7 +57,7 @@ class ProdutoCaracteristicaJpaController(
         }
 
         val produto = novoProduto.idProduto.let {
-            produtoRepository.findById(it.toInt().toLong()).orElseThrow {
+            produtoRepository.findById(it.toInt()).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }
@@ -79,7 +79,7 @@ class ProdutoCaracteristicaJpaController(
             ?: return ResponseEntity.status(404).build()
 
         val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
-            tipoCaracteristicaRepository.findById(it).orElseThrow {
+            tipoCaracteristicaRepository.findById(it.toInt()).orElseThrow {
                 IdNaoEncontradoException("TipoCaracteristica", it)
             }
         }
@@ -89,7 +89,7 @@ class ProdutoCaracteristicaJpaController(
             }
         }
         val produto = novoProduto.idProduto.let {
-            produtoRepository.findById(it.toInt().toLong()).orElseThrow {
+            produtoRepository.findById(it.toInt()).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }

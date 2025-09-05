@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ProdutoCaracteristicaRepository : JpaRepository<ProdutoCaracteristica, Int> {
 
-    fun findByCaracteristica_Id(codigo: Int): List<ProdutoCaracteristica>
+    fun findByCaracteristica_IdCaracteristica(codigo: Int): List<ProdutoCaracteristica>
 
 }
