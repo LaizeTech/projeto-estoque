@@ -31,11 +31,11 @@ class PlataformaProdutoJpaController(
 
     @PostMapping
     fun create(@RequestBody dto: PlataformaProdutoDTO): ResponseEntity<PlataformaProduto> {
-        val plataforma = plataformaRepository.findById(dto.fkPlataforma)
-        val produto = produtoRepository.findById(dto.fkProduto.toLong())
-        val caracteristica = caracteristicaRepository.findById(dto.fkCaracteristica)
-        val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.fkTipoCaracteristica.toLong())
-        val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.fkProdutoCaracteristica)
+        val plataforma = plataformaRepository.findById(dto.id_plataforma)
+        val produto = produtoRepository.findById(dto.id_produto)
+        val caracteristica = caracteristicaRepository.findById(dto.id_caracteristica)
+        val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.id_tipo_caracteristica)
+        val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.id_produto_caracteristica)
 
         if (plataforma.isEmpty || produto.isEmpty || caracteristica.isEmpty ||
             tipoCaracteristica.isEmpty || produtoCaracteristica.isEmpty
@@ -49,7 +49,7 @@ class PlataformaProdutoJpaController(
             caracteristica = caracteristica.get(),
             tipoCaracteristica = tipoCaracteristica.get(),
             produtoCaracteristica = produtoCaracteristica.get(),
-            quantidadeProdutoPlataforma = dto.quantidadeProdutoPlataforma
+            quantidadeProdutoPlataforma = dto.quantidade_produto_plataforma
         )
         return ResponseEntity.status(201).body(plataformaProdutoRepository.save(nova))
     }
@@ -59,11 +59,11 @@ class PlataformaProdutoJpaController(
         val existente = plataformaProdutoRepository.findById(id)
         if (existente.isEmpty) return ResponseEntity.status(404).build()
 
-        val plataforma = plataformaRepository.findById(dto.fkPlataforma)
-        val produto = produtoRepository.findById(dto.fkProduto.toLong())
-        val caracteristica = caracteristicaRepository.findById(dto.fkCaracteristica)
-        val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.fkTipoCaracteristica.toLong())
-        val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.fkProdutoCaracteristica)
+        val plataforma = plataformaRepository.findById(dto.id_plataforma)
+        val produto = produtoRepository.findById(dto.id_produto)
+        val caracteristica = caracteristicaRepository.findById(dto.id_caracteristica)
+        val tipoCaracteristica = tipoCaracteristicaRepository.findById(dto.id_tipo_caracteristica)
+        val produtoCaracteristica = produtoCaracteristicaRepository.findById(dto.id_produto_caracteristica)
 
         if (plataforma.isEmpty || produto.isEmpty || caracteristica.isEmpty ||
             tipoCaracteristica.isEmpty || produtoCaracteristica.isEmpty
@@ -77,7 +77,7 @@ class PlataformaProdutoJpaController(
             this.caracteristica = caracteristica.get()
             this.tipoCaracteristica = tipoCaracteristica.get()
             this.produtoCaracteristica = produtoCaracteristica.get()
-            this.quantidadeProdutoPlataforma = dto.quantidadeProdutoPlataforma
+            this.quantidadeProdutoPlataforma = dto.quantidade_produto_plataforma
         }
         return ResponseEntity.ok(plataformaProdutoRepository.save(atualizado))
     }

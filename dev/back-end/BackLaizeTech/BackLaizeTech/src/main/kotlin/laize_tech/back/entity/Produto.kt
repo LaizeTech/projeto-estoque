@@ -8,10 +8,11 @@ import java.time.LocalDateTime
 data class Produto(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val idProduto: Long = 0,             // <-- ÚNICO campo para o ID
+    @Column(name = "id_produto")
+    val idProduto: Int = 0,             // <-- ÚNICO campo para o ID
 
     @ManyToOne
-    @JoinColumn(name = "fk_categoria")
+    @JoinColumn(name = "id_categoria")
     var categoria: Categoria?,
 
     var nomeProduto: String?,            // <-- ÚNICO campo para o nome

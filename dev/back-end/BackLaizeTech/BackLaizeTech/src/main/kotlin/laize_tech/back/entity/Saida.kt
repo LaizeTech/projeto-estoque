@@ -8,20 +8,20 @@ import java.time.LocalDate
 data class Saida(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idSaida")
+    @Column(name = "id_saida")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idSaida: Int? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkTipoSaida")
+    @JoinColumn(name = "id_tipo_saida")
     var tipoSaida: TipoSaida? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkEmpresa")
+    @JoinColumn(name = "id_empresa")
     var empresa: Empresa? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkPlataforma")
+    @JoinColumn(name = "id_plataforma")
     var plataforma: Plataforma? = null,
 
     var dtVenda: LocalDate = LocalDate.now(),
@@ -33,7 +33,7 @@ data class Saida(
     var totalDesconto: Double? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkStatusVenda")
+    @JoinColumn(name = "id_status_venda")
     var statusVenda: StatusVenda? = null
 
 ) {

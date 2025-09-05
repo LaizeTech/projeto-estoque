@@ -94,7 +94,7 @@ class UsuarioJpaController(
 
         val usuarioExistente = repositorio.findById(id.toInt()).orElse(null)
 
-        if (repositorio.findAll().any { it.email == usuarioDTO.email && it.idUsuario != id }) {
+        if (repositorio.findAll().any { it.email == usuarioDTO.email && it.idUsuario.toLong() != id }) {
             return ResponseEntity.status(409).body("Já existe um usuário cadastrado com o e-mail '${usuarioDTO.email}'.")
         }
 
