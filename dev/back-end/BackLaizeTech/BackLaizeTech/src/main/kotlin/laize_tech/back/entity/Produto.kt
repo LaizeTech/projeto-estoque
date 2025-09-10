@@ -13,19 +13,19 @@ data class Produto(
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")
-    var categoria: Categoria?,
+    var categoria: Categoria? = null,
 
     @Column(name = "nome_produto")
-    var nomeProduto: String?,
+    var nomeProduto: String? = null,
 
     @Column(name = "quantidade_produto")
-    var quantidadeProduto: Int,
+    var quantidadeProduto: Int = 0,
 
     @Column(name = "status_ativo")
     var statusAtivo: Boolean = true,
 
     @Column(name = "caminho_imagem")
-    var caminhoImagem: String?,
+    var caminhoImagem: String? = null,
 
     val dtRegistro: LocalDateTime = LocalDateTime.now()
 ){
