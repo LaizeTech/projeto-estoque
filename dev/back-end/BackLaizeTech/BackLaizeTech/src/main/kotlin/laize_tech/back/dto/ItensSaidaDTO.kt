@@ -1,11 +1,11 @@
 package laize_tech.back.dto
 
 data class ItensSaidaDTO(
-    val idSaida: Long,
-    val idPlataforma: Long,
+    val idSaida: Int,
+    val idPlataforma: Int,
     val quantidade: Int,
-    val idTipoCaracteristica: Long,
-    val idCaracteristica: Long,
-    val idProdutoCaracteristica: Long,
-    val idProduto: Long
+    val idTipoCaracteristica: Int,
+    val idCaracteristica: Int,
+    val idProdutoCaracteristica: Int,
+    val idProduto: Int
 )

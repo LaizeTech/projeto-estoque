@@ -1,8 +1,8 @@
 package laize_tech.back.dto
 
 data class ProdutoCaracteristicaDTO(
-    val idProduto: Long,
-    val idTipoCaracteristica: Long,
-    val idCaracteristica: Long,
+    val idProduto: Int,
+    val idTipoCaracteristica: Int,
+    val idCaracteristica: Int,
     val quantidadeProduto: Int
 )

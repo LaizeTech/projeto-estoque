@@ -34,7 +34,7 @@ class ProdutoCaracteristicaJpaController(
 
     @GetMapping("/caracteristica/{codigo}")
     fun getProdutoPorCaracteristica(@PathVariable codigo: Int): ResponseEntity<List<ProdutoCaracteristica>> {
-        val produtoCaracteristica = repositorio.findByCaracteristica_Id(codigo)
+        val produtoCaracteristica = repositorio.findByCaracteristica_IdCaracteristica(codigo)
 
         if (produtoCaracteristica.isEmpty()) {
             throw IdNaoEncontradoException("Caracteristica", codigo)
@@ -57,7 +57,7 @@ class ProdutoCaracteristicaJpaController(
         }
 
         val produto = novoProduto.idProduto.let {
-            produtoRepository.findById(it.toInt().toLong()).orElseThrow {
+            produtoRepository.findById(it).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }
@@ -89,7 +89,7 @@ class ProdutoCaracteristicaJpaController(
             }
         }
         val produto = novoProduto.idProduto.let {
-            produtoRepository.findById(it.toInt().toLong()).orElseThrow {
+            produtoRepository.findById(it).orElseThrow {
                 IdNaoEncontradoException("Produto", it)
             }
         }

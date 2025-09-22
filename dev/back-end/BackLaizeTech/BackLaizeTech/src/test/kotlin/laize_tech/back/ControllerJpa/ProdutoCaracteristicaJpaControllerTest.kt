@@ -47,8 +47,8 @@ class ProdutoCaracteristicaJpaControllerTest {
         `when`(repositorio.existsById(1)).thenReturn(true)
         `when`(repositorio.existsById(99)).thenReturn(false)
 
-        `when`(repositorio.findByCaracteristica_Id(1)).thenReturn(produtos)
-        `when`(repositorio.findByCaracteristica_Id(99)).thenReturn(emptyList())
+        `when`(repositorio.findByCaracteristica_IdCaracteristica(1)).thenReturn(produtos)
+        `when`(repositorio.findByCaracteristica_IdCaracteristica(99)).thenReturn(emptyList())
     }
 
     @Test

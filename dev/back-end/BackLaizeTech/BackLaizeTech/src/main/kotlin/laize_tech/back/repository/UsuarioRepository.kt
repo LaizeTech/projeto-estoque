@@ -6,10 +6,12 @@ import laize_tech.back.entity.Usuario
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import java.util.Optional
 
 interface UsuarioRepository : JpaRepository<Usuario, Int> {
     fun findByNome(nome: String): List<Usuario>
 
     fun findByAcessoFinanceiro(AcessoFinanceiro: Boolean): List<Usuario>
 
+    fun findByEmail(email: String): Optional<Usuario>
 }

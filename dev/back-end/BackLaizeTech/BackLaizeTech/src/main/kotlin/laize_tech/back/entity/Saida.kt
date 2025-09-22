@@ -2,40 +2,45 @@ package laize_tech.back.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
-import java.time.LocalDate
+import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Entity
 data class Saida(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idSaida")
+    @Column(name = "id_saida")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idSaida: Int? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkTipoSaida")
+    @JoinColumn(name = "id_tipo_saida")
     var tipoSaida: TipoSaida? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkEmpresa")
+    @JoinColumn(name = "id_empresa")
     var empresa: Empresa? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkPlataforma")
+    @JoinColumn(name = "id_plataforma")
     var plataforma: Plataforma? = null,
 
-    var dtVenda: LocalDate = LocalDate.now(),
+    @Column(name = "numero_pedido")
+    var numeroPedido: String? = null,
 
-    var precoVenda: Double? = null,
+    @Column(name = "dt_venda")
+    var dtVenda: LocalDateTime = LocalDateTime.now(),
 
-    var totalTaxa: Double? = null,
+    @Column(name = "preco_venda", precision = 10, scale = 2)
+    var precoVenda: BigDecimal? = null,
 
-    var totalDesconto: Double? = null,
+    @Column(name = "total_desconto", precision = 10, scale = 2)
+    var totalDesconto: BigDecimal? = null,
 
     @ManyToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "fkStatusVenda")
+    @JoinColumn(name = "id_status_venda")
     var statusVenda: StatusVenda? = null
 
 ) {
-    constructor() : this(null, null, null, null, LocalDate.now(), null, null, null, null)
+    constructor() : this(null, null, null, null, null, LocalDateTime.now(), null, null, null)
 }

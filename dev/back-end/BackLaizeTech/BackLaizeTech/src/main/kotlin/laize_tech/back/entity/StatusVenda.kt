@@ -1,12 +1,12 @@
 package laize_tech.back.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
+
+enum class StatusVendaEnum {
+    PENDENTE, FINALIZADA, CANCELADA
+}
 
 @Entity
 data class StatusVenda(
@@ -14,11 +14,13 @@ data class StatusVenda(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_status_venda")
     var idStatusVenda: Int? = null,
 
-    @field:NotBlank
-    @field:Size(min = 2, max = 120)
-    var nomeStatus: String = ""
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(name = "nome_status")
+    var nomeStatus: StatusVendaEnum = StatusVendaEnum.PENDENTE
 ) {
-    constructor() : this(null, "")
+    constructor() : this(null, StatusVendaEnum.PENDENTE)
 }

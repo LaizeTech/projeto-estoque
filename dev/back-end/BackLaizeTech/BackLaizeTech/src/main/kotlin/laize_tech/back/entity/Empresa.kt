@@ -10,9 +10,13 @@ data class Empresa(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_empresa")
     var idEmpresa:Int?,
-    @field:NotBlank @field:Size(min = 2, max = 50) var nomeEmpresa: String,
-    @field:Size(min = 14, max = 14) var cnpj: String
+    @field:NotBlank @field:Size(min = 2, max = 50) 
+    @Column(name = "nome_empresa")
+    var nomeEmpresa: String,
+    @field:Size(min = 14, max = 14) 
+    var cnpj: String
 ) {
     constructor() : this(null, "", "")
 }
