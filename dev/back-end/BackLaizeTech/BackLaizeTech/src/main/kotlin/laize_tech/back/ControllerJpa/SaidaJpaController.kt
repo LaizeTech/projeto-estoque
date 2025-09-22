@@ -11,10 +11,13 @@ import laize_tech.back.repository.PlataformaRepository
 import laize_tech.back.repository.StatusVendaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @RestController
+@CrossOrigin(origins = ["http://localhost:5173"])
 @RequestMapping("/saidas")
 class SaidaJpaController(
     val repositorio: SaidaRepository,
@@ -23,6 +26,16 @@ class SaidaJpaController(
     val plataformaRepository: PlataformaRepository,
     val statusVendaRepository: StatusVendaRepository
 ) {
+
+    @GetMapping("/renda-bruta-7dias")
+    fun getRendaBruta7Dias(): ResponseEntity<Any> {
+        val rendaBruta = repositorio.calcularRendaBruta7Dias()
+        return if (rendaBruta != null) {
+            ResponseEntity.ok(mapOf("renda_bruta_7dias" to rendaBruta))
+        } else {
+            ResponseEntity.status(204).build()
+        }
+    }
 
     @GetMapping
     fun get(): ResponseEntity<List<Saida>> {
