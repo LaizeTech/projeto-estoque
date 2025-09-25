@@ -38,8 +38,8 @@ JOIN tipo_saida ts ON s.id_tipo_saida = ts.id_tipo_saida
 JOIN plataforma p ON s.id_plataforma = p.id_plataforma
 WHERE ts.id_tipo_saida = 1
   AND sv.id_status_venda = 1
-  AND MONTH(s.dt_venda) = 1
-  AND YEAR(s.dt_venda) = 2025
+  AND MONTH(s.dt_venda) = MONTH(CURDATE())
+  AND YEAR(s.dt_venda) = YEAR(CURDATE())
 GROUP BY p.nome_plataforma;
     """)
     fun quantidadeVendasPorPlataformaNoMesAtual(): List<Array<Any>>
