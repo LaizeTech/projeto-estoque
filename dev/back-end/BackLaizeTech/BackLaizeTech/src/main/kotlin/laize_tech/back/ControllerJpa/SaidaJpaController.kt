@@ -131,4 +131,29 @@ class SaidaJpaController(
 
         return ResponseEntity.status(404).body("")
     }
+
+    @GetMapping("/por-plataforma")
+    fun getQuantidadeVendasPorPlataformaNoMesAtual(): ResponseEntity<Any> {
+        val resultados = repositorio.quantidadeVendasPorPlataformaNoMesAtual()
+
+        if (resultados.isEmpty()) {
+            return ResponseEntity.status(204).build()
+        }
+
+        val resposta = resultados.map { resultado ->
+            mapOf(
+                "quantidade_venda" to (resultado[0] as Number).toInt(),
+                "plataforma" to resultado[1] as String
+            )
+        }
+
+        return ResponseEntity.ok(resposta)
+    }
+
+    @GetMapping("/quantidade-ultimos-3-dias")
+    fun getQuantidadeSaidasUltimos3Dias(): ResponseEntity<Any> {
+        val quantidade = repositorio.quantidadeSaidasUltimos3Dias()
+        return ResponseEntity.ok(mapOf("quantidade_saidas_ultimos_3_dias" to quantidade))
+    }
+
 }

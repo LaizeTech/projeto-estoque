@@ -1,6 +1,7 @@
 package laize_tech.back.controller
 
 import jakarta.validation.Valid
+import laize_tech.back.dto.ProdutoAlertaDTO
 import laize_tech.back.entity.ConfiguracaoAlertasQTD
 import laize_tech.back.repository.ConfiguracaoAlertasQTDRepository
 import org.springframework.http.ResponseEntity
@@ -54,5 +55,24 @@ class ConfiguracaoAlertasQTDJpaController(
         } else {
             ResponseEntity.notFound().build()
         }
+    }
+
+    @GetMapping("/produto-alerta")
+    fun getProdutoAlerta(): ResponseEntity<List<ProdutoAlertaDTO>> {
+        val resultadosMap = repositorio.findProdutoAlerta()
+
+        if (resultadosMap.isEmpty()) {
+            return ResponseEntity.noContent().build()
+        }
+
+        val alertasDTO = resultadosMap.map { row ->
+            ProdutoAlertaDTO(
+                nomeProduto = row["nome_produto"] as String,
+                quantidadeProduto = row["quantidade_produto"] as Int,
+                nivelAlerta = row["nivel_alerta"] as String
+            )
+        }
+
+        return ResponseEntity.ok(alertasDTO)
     }
 }
