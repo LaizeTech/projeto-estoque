@@ -7,6 +7,7 @@ import jakarta.persistence.*
 data class ConfiguracaoAlertasQTD(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_configuracao_alertas_qtd")
     val idConfiguracaoAlertasQTD: Int = 0,
 
     @Column(nullable = false)

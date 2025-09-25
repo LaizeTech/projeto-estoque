@@ -14,4 +14,9 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     fun findByAcessoFinanceiro(AcessoFinanceiro: Boolean): List<Usuario>
 
     fun findByEmail(email: String): Optional<Usuario>
+
+    @Query(nativeQuery = true, value = """SELECT count(id_usuario) 
+            FROM Usuario
+            WHERE status_ativo = 1;""")
+    fun countByAtivo(ativo: Boolean): Long
 }

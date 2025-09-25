@@ -261,4 +261,12 @@ class UsuarioJpaController(
             ResponseEntity.status(200).body(listagemUsuarios)
         }
     }
+
+    @GetMapping("/contar-ativos")
+    fun contarUsuariosAtivos(): ResponseEntity<Map<String, Long>> {
+        val count = repositorio.countByAtivo(true)
+        val response = mapOf("usuarios_ativos" to count)
+        return ResponseEntity.status(200).body(response)
+    }
+
 }
