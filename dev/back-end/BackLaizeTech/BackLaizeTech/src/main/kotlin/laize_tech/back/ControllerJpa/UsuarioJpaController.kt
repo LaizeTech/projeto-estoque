@@ -1,10 +1,7 @@
 package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
-import laize_tech.back.dto.ListagemUsuarioDTO
-import laize_tech.back.dto.LoginDTO
-import laize_tech.back.dto.LoginResponseDTO
-import laize_tech.back.dto.UsuarioDTO
+import laize_tech.back.dto.*
 import laize_tech.back.entity.Usuario
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.EmpresaRepository
@@ -269,4 +266,26 @@ class UsuarioJpaController(
         return ResponseEntity.status(200).body(response)
     }
 
+    @GetMapping("/buscar-funcionarios/{id}")
+    fun buscarFuncionarios(@PathVariable id: Int): ResponseEntity<List<BuscarFuncDTO>>{
+        val funcionarios = repositorio.findByIdEmpresaAndAcessoFinanceiro(id)
+        if (funcionarios.isEmpty()){
+            return ResponseEntity.status(204).build()
+        } else {
+            return ResponseEntity.status(200).body(funcionarios)
+        }
+    }
+
+    @PatchMapping("/mudar-status/{id}")
+    fun mudarStatus(@PathVariable id: Int): ResponseEntity<String> {
+        val usuario = repositorio.findById(id).orElse(null)
+            ?: return ResponseEntity.status(404).body("Usuário com o ID $id não encontrado.")
+        usuario.statusAtivo = !usuario.statusAtivo
+        return try {
+            repositorio.save(usuario)
+            ResponseEntity.status(200).body("Status do usuário alterado com sucesso.")
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body("Erro ao alterar o status do usuário.")
+        }
+    }
 }

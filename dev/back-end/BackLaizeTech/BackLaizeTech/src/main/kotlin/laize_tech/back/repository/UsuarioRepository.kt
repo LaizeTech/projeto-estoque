@@ -1,6 +1,7 @@
 package laize_tech.back.repository
 
 import jakarta.transaction.Transactional
+import laize_tech.back.dto.BuscarFuncDTO
 import laize_tech.back.dto.UsuarioDTO
 import laize_tech.back.entity.Usuario
 import org.springframework.data.jpa.repository.JpaRepository
@@ -19,4 +20,10 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
             FROM Usuario
             WHERE status_ativo = 1;""")
     fun countByAtivo(ativo: Boolean): Long
+
+    @Query(nativeQuery = true, value = """SELECT id_usuario, nome, status_ativo
+            FROM Usuario
+            WHERE id_empresa = :idEmpresa AND acesso_financeiro = 0;""")
+    fun findByIdEmpresaAndAcessoFinanceiro(idEmpresa: Int): List<BuscarFuncDTO>
+
 }
