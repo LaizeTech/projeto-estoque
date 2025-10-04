@@ -6,6 +6,7 @@ import laize_tech.back.dto.UltimasComprasDTO
 import laize_tech.back.entity.CompraProduto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CompraProdutoRepository
+import laize_tech.back.repository.HistoricoCompraProjection
 import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -109,4 +110,13 @@ class CompraProdutoJpaController(
         return ResponseEntity.status(200).body(mapOf("quantidade_entradas_ultimos_3_dias" to count))
     }
 
+    @GetMapping("/historico-compras")
+    fun getHistoricoCompras(): ResponseEntity<List<HistoricoCompraProjection>> {
+        val historico = compraProdutoRepository.findHistoricoCompra()
+        if (historico.isEmpty()){
+            return ResponseEntity.status(204).build()
+        } else {
+            return ResponseEntity.status(200).body(historico)
+        }
+    }
 }
