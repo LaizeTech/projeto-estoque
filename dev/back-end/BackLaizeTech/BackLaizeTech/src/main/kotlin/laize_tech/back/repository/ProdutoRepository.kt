@@ -3,137 +3,81 @@ package laize_tech.back.repository
 import laize_tech.back.entity.Produto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 
-
+@Repository
 interface ProdutoRepository : JpaRepository<Produto, Int> {
 
-    @Query(
-        value = """
-            SELECT 
-                MONTHNAME(cp.dt_compra) AS mes,
-                SUM(cp.quantidade_produto) AS quantidade_produtos,
-                SUM(cp.preco_compra * cp.quantidade_produto) AS valor_investido
-            FROM 
-                Compra_Produto cp
-            WHERE 
-                MONTH(cp.dt_compra) = MONTH(CURDATE()) 
-                AND YEAR(cp.dt_compra) = YEAR(CURDATE())
-            GROUP BY 
-                mes
-        """, nativeQuery = true
-    )
+    @Query(nativeQuery = true, value = """
+        SELECT 
+            MONTHNAME(cp.dt_compra) AS mes,
+            COUNT(cp.id_produto) AS quantidade_produtos,
+            SUM(cp.preco_compra * cp.quantidade_produto) AS valor_investido
+        FROM Compra_Produto cp
+        WHERE MONTH(cp.dt_compra) = MONTH(CURRENT_DATE()) AND YEAR(cp.dt_compra) = YEAR(CURRENT_DATE())
+        GROUP BY mes
+    """)
     fun getEntradasMesAtual(): List<Array<Any>>
 
-    @Query(
-        value = """
-            SELECT 
-                DATE_FORMAT(s.dt_venda, '%M') AS mes
-            FROM Itens_Saida isv
-            JOIN Produto p ON isv.id_produto = p.id_produto
-            JOIN Saida s ON isv.id_saida = s.id_saida
-            WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
-              AND s.id_tipo_saida = 1
-              AND s.id_status_venda = 1
-              AND s.id_plataforma = :plataforma -- Adicionado/Corrigido
-            GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda), DATE_FORMAT(s.dt_venda, '%M')
-            ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-        """, nativeQuery = true
-    )
-    fun getMesAtual(plataforma: Long): List<Array<Any>>
-
-    @Query(
-        value = """
-            SELECT 
-                SUM(isv.quantidade) AS quantidade_produtos
-            FROM Itens_Saida isv
-            JOIN Produto p ON isv.id_produto = p.id_produto
-            JOIN Saida s ON isv.id_saida = s.id_saida
-            WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
-              AND s.id_tipo_saida = 1
-              AND s.id_status_venda = 1
-              AND s.id_plataforma = :plataforma -- Adicionado/Corrigido
-            GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-            ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-        """, nativeQuery = true
-    )
-    fun getqtdProdutoVendido(plataforma: Long): List<Array<Any>>
-
-    @Query(
-        value = """
-            SELECT 
-                SUM(isv.quantidade * s.preco_venda) AS valor_total
-            FROM Itens_Saida isv
-            JOIN Produto p ON isv.id_produto = p.id_produto
-            JOIN Saida s ON isv.id_saida = s.id_saida
-            WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
-              AND s.id_tipo_saida = 1
-              AND s.id_status_venda = 1
-              AND s.id_plataforma = :plataforma -- Adicionado/Corrigido
-            GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-            ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-        """, nativeQuery = true
-    )
-    fun getTotalVendido(plataforma: Long): List<Array<Any>>
-
-    @Query(
-        value = """
-            SELECT
-                p.nome_Produto,
-                SUM(isv.quantidade) AS totalVendido
-            FROM
-                Itens_Saida isv
-            JOIN
-                Produto p ON isv.id_Produto = p.id_Produto
-            JOIN
-                Saida s ON isv.id_Saida = s.id_Saida
-            WHERE
-                s.dt_Venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-                AND s.id_tipo_saida = 1
-                AND s.id_status_venda = 1
-                AND s.id_plataforma = :plataforma -- Corrigido para usar o placeholder
-            GROUP BY
-                p.nome_Produto
-            ORDER BY
-                totalVendido DESC
-            LIMIT 5
-        """, nativeQuery = true
-    )
-    fun getTop5Produtos(plataforma: Long): List<Array<Any>>
-
-    @Query(
-        value = """
-            SELECT p.nome_Produto
-            FROM Produto p
-            WHERE p.id_Produto NOT IN (
-                SELECT DISTINCT isv.id_Produto
-                FROM Itens_Saida isv
-                JOIN Saida s ON isv.id_Saida = s.id_Saida
-                WHERE s.dt_Venda >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
-                  AND s.id_tipo_saida = 1
-                  AND s.id_status_venda = 1
-                  AND s.id_plataforma = :plataforma -- Já estava correto
-            )
-        """, nativeQuery = true
-    )
-    fun getProdutosInativos(plataforma: Long): List<String>
-
-    @Query(
-        value = """
+    @Query(nativeQuery = true, value = """
         SELECT 
-            MONTHNAME(s.dt_venda) AS mes,
-            SUM(isv.quantidade * s.preco_venda) AS receita_mensal
-        FROM Itens_Saida isv
-        JOIN Produto p ON isv.id_produto = p.id_produto
-        JOIN Saida s ON isv.id_saida = s.id_saida
-        WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
-          AND s.id_tipo_saida = 1
-          AND s.id_status_venda = 1
-          AND s.id_plataforma = :plataforma -- Já estava correto
-        GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-        ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
-    """,
-        nativeQuery = true
-    )
-    fun getReceitaMensal(plataforma: Long): List<Array<Any>>
+            DATE_FORMAT(s.dt_venda, '%Y-%m') AS mes,
+            SUM(s.preco_venda * i.quantidade) AS receita
+        FROM Saida s
+        JOIN Itens_Saida i ON s.id_saida = i.id_saida
+        WHERE s.id_plataforma = :plataformaId
+        AND s.dt_venda >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY mes
+        ORDER BY mes ASC
+    """)
+    fun getReceitaMensal(@Param("plataformaId") plataformaId: Long): List<Array<Any>>
 
+    @Query(nativeQuery = true, value = """
+        SELECT 
+            p.nome_produto, 
+            SUM(i.quantidade) AS total_vendido
+        FROM Produto p
+        JOIN Itens_Saida i ON p.id_produto = i.id_produto
+        JOIN Saida s ON i.id_saida = s.id_saida
+        WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2 -- FINALIZADA
+        GROUP BY p.nome_produto
+        ORDER BY total_vendido DESC
+        LIMIT 5
+    """)
+    fun getTop5Produtos(@Param("plataformaId") plataformaId: Long): List<Array<Any>>
+
+    @Query(nativeQuery = true, value = """
+        SELECT DISTINCT p.nome_produto
+        FROM Produto p
+        WHERE p.id_produto NOT IN (
+            SELECT i.id_produto
+            FROM Itens_Saida i
+            JOIN Saida s ON i.id_saida = s.id_saida
+            WHERE s.dt_venda >= DATE_SUB(NOW(), INTERVAL 60 DAY)
+            AND s.id_plataforma = :plataformaId
+        )
+    """)
+    fun getProdutosInativos(@Param("plataformaId") plataformaId: Long): List<String>
+
+    // CORREÇÃO: Alterado o tipo de retorno para Double?. É mais seguro e correto para um único resultado.
+    @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda * i.quantidade) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
+    fun getTotalVendido(@Param("plataformaId") plataformaId: Long): Double?
+
+    // CORREÇÃO: Alterado o tipo de retorno para Int?.
+    @Query(nativeQuery = true, value = "SELECT SUM(i.quantidade) FROM Itens_Saida i JOIN Saida s ON i.id_saida = s.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
+    fun getqtdProdutoVendido(@Param("plataformaId") plataformaId: Long): Int?
+
+    @Query(nativeQuery = true, value = """
+    SELECT 
+        pl.nome_plataforma, 
+        SUM(i.quantidade) AS total_vendido
+    FROM Plataforma pl
+    JOIN Saida s ON pl.id_plataforma = s.id_plataforma
+    JOIN Itens_Saida i ON s.id_saida = i.id_saida
+    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    GROUP BY pl.nome_plataforma
+    ORDER BY total_vendido DESC
+""")
+    fun getVendasPorPlataforma(): List<Array<Any>>
 }
