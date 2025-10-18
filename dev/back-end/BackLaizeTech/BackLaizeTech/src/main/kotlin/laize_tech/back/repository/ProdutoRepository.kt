@@ -4,8 +4,54 @@ import laize_tech.back.entity.Produto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
-
 interface ProdutoRepository : JpaRepository<Produto, Long> {
+
+@Query(value = """
+        SELECT YEAR(s.dt_venda) AS ano, SUM(s.preco_venda) AS receita
+        FROM Saida s
+        WHERE s.id_empresa = :empresa
+        GROUP BY YEAR(s.dt_venda)
+        ORDER BY ano
+    """, nativeQuery = true)
+    fun getReceitaAnual(@Param("empresa") empresa: Long): List<Array<Any>>
+
+    @Query(value = """
+        SELECT p.nome_plataforma, SUM(s.preco_venda) AS valor
+        FROM Saida s
+        JOIN Plataforma p ON s.id_plataforma = p.id_plataforma
+        WHERE YEAR(s.dt_venda) = :ano
+        GROUP BY p.id_plataforma, p.nome_plataforma
+    """, nativeQuery = true)
+    fun getValorPorPlataforma(@Param("ano") ano: Int): List<Array<Any>>
+
+    @Query(value = """
+        SELECT MONTHNAME(s.dt_venda) AS mes, COUNT(*) AS qtd
+        FROM Saida s
+        WHERE s.id_plataforma = :plataforma AND YEAR(s.dt_venda) = :ano
+        GROUP BY MONTH(s.dt_venda)
+        ORDER BY qtd DESC
+        LIMIT 5
+    """, nativeQuery = true)
+    fun getTop5Meses(@Param("plataforma") plataforma: Long, @Param("ano") ano: Int): List<Array<Any>>
+
+    @Query(value = """
+        SELECT pl.nome_plataforma, SUM(i.quantidade) AS quantidade_vendida
+        FROM Itens_Saida i
+        JOIN Plataforma pl ON i.id_plataforma = pl.id_plataforma
+        GROUP BY pl.id_plataforma, pl.nome_plataforma
+    """, nativeQuery = true)
+    fun getQuantidadePorPlataforma(): List<Array<Any>>
+
+    @Query(value = """
+        SELECT pr.nome_produto, SUM(i.quantidade) AS qtd_vendida
+        FROM Itens_Saida i
+        JOIN Produto pr ON i.id_produto = pr.id_produto
+        WHERE i.id_plataforma = :plataforma
+        GROUP BY pr.id_produto, pr.nome_produto
+        ORDER BY qtd_vendida DESC
+        LIMIT 5
+    """, nativeQuery = true)
+    fun getTop5ProdutosPorPlataforma(@Param("plataforma") plataforma: Long): List<Array<Any>>
 
     @Query(
         value = """
@@ -34,7 +80,7 @@ interface ProdutoRepository : JpaRepository<Produto, Long> {
             WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
               AND s.id_tipo_saida = 1
               AND s.id_status_venda = 1
-              AND s.id_plataforma = :plataforma -- Adicionado/Corrigido
+              AND s.id_plataforma = :plataforma 
             GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda), DATE_FORMAT(s.dt_venda, '%M')
             ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
         """, nativeQuery = true
@@ -68,7 +114,7 @@ interface ProdutoRepository : JpaRepository<Produto, Long> {
             WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
               AND s.id_tipo_saida = 1
               AND s.id_status_venda = 1
-              AND s.id_plataforma = :plataforma -- Adicionado/Corrigido
+              AND s.id_plataforma = :plataforma 
             GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda)
             ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
         """, nativeQuery = true
@@ -90,7 +136,7 @@ interface ProdutoRepository : JpaRepository<Produto, Long> {
                 s.dt_Venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                 AND s.id_tipo_saida = 1
                 AND s.id_status_venda = 1
-                AND s.id_plataforma = :plataforma -- Corrigido para usar o placeholder
+                AND s.id_plataforma = :plataforma 
             GROUP BY
                 p.nome_Produto
             ORDER BY
@@ -111,7 +157,7 @@ interface ProdutoRepository : JpaRepository<Produto, Long> {
                 WHERE s.dt_Venda >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
                   AND s.id_tipo_saida = 1
                   AND s.id_status_venda = 1
-                  AND s.id_plataforma = :plataforma -- Já estava correto
+                  AND s.id_plataforma = :plataforma 
             )
         """, nativeQuery = true
     )
@@ -128,7 +174,7 @@ interface ProdutoRepository : JpaRepository<Produto, Long> {
         WHERE s.dt_venda >= DATE_SUB(CURDATE(), INTERVAL 4 MONTH)
           AND s.id_tipo_saida = 1
           AND s.id_status_venda = 1
-          AND s.id_plataforma = :plataforma -- Já estava correto
+          AND s.id_plataforma = :plataforma 
         GROUP BY YEAR(s.dt_venda), MONTH(s.dt_venda)
         ORDER BY YEAR(s.dt_venda), MONTH(s.dt_venda)
     """,
