@@ -131,4 +131,53 @@ class SaidaJpaController(
 
         return ResponseEntity.status(404).body("")
     }
+
+    @GetMapping("/por-plataforma")
+    fun getQuantidadeVendasPorPlataformaNoMesAtual(): ResponseEntity<Any> {
+        val resultados = repositorio.quantidadeVendasPorPlataformaNoMesAtual()
+
+        if (resultados.isEmpty()) {
+            return ResponseEntity.status(204).build()
+        }
+
+        val resposta = resultados.map { resultado ->
+            mapOf(
+                "quantidade_venda" to (resultado[0] as Number).toInt(),
+                "plataforma" to resultado[1] as String
+            )
+        }
+
+        return ResponseEntity.ok(resposta)
+    }
+
+    @GetMapping("/quantidade-ultimos-3-dias")
+    fun getQuantidadeSaidasUltimos3Dias(): ResponseEntity<Any> {
+        val quantidade = repositorio.quantidadeSaidasUltimos3Dias()
+        return ResponseEntity.ok(mapOf("quantidade_saidas_ultimos_3_dias" to quantidade))
+    }
+
+
+    @GetMapping("/detalhes")
+    fun getDetalhes(): ResponseEntity<List<Map<String, Any?>>> {
+        val resultados = repositorio.findSaidasDetalhes()
+
+        if (resultados.isEmpty()) {
+            return ResponseEntity.status(204).build()
+        }
+
+        val listaDetalhada = resultados.map { row ->
+            mapOf(
+                "id_saida" to row[0],
+                "nome_produto" to row[1],
+                "quantidade" to row[2],
+                "plataforma" to row[3],
+                "data_venda" to row[4],
+                "status_produto" to if ((row[5] as? Number)?.toInt() == 1) "ATIVO" else "DESATIVO",
+                "preco_venda" to row[6],
+                "fornecedor" to row[7]
+            )
+        }
+        return ResponseEntity.ok(listaDetalhada)
+    }
+
 }

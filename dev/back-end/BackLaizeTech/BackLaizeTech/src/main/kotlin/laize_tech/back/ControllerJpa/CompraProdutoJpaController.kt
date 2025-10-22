@@ -2,13 +2,15 @@ package laize_tech.back.ControllerJpa
 
 import jakarta.validation.Valid
 import laize_tech.back.dto.CompraProdutoDTO
+import laize_tech.back.dto.UltimasComprasDTO
 import laize_tech.back.entity.CompraProduto
-import laize_tech.back.entity.Produto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CompraProdutoRepository
+import laize_tech.back.repository.HistoricoCompraProjection
 import laize_tech.back.repository.ProdutoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @RestController
@@ -81,5 +83,40 @@ class CompraProdutoJpaController(
         }
         val mensagem = "Não foi possível deletar a compra com id $id"
         return ResponseEntity.status(404).body(mensagem)
+    }
+
+    @GetMapping("/ultimas-compras")
+    fun getUltimasCompras(): ResponseEntity<List<UltimasComprasDTO>> {
+        val comprasMap = compraProdutoRepository.findUltimasCompra()
+
+        if (comprasMap.isEmpty()) {
+            return ResponseEntity.status(204).build()
+        }
+
+        val comprasDTO = comprasMap.map { row ->
+            UltimasComprasDTO(
+                nomeProduto = row["nome_produto"] as String,
+                precoCompra = row["preco_compra"] as BigDecimal,
+                quantidadeProduto = row["quantidade_produto"] as Int
+            )
+        }
+
+        return ResponseEntity.status(200).body(comprasDTO)
+    }
+
+    @GetMapping("/contagem-ultimos-3-dias")
+    fun countComprasUltimos3Dias(): ResponseEntity<Map<String, Int>> {
+        val count = compraProdutoRepository.countComprasUltimos3Dias()
+        return ResponseEntity.status(200).body(mapOf("quantidade_entradas_ultimos_3_dias" to count))
+    }
+
+    @GetMapping("/historico-compras")
+    fun getHistoricoCompras(): ResponseEntity<List<HistoricoCompraProjection>> {
+        val historico = compraProdutoRepository.findHistoricoCompra()
+        if (historico.isEmpty()){
+            return ResponseEntity.status(204).build()
+        } else {
+            return ResponseEntity.status(200).body(historico)
+        }
     }
 }
