@@ -1,99 +1,29 @@
 package laize_tech.back.ControllerJpa
 
-import jakarta.validation.Valid
-import laize_tech.back.dto.*
-import laize_tech.back.entity.Categoria
-import laize_tech.back.entity.Produto
+import laize_tech.back.dto.ProdutoCaracteristicaDTO
+import laize_tech.back.entity.ProdutoCaracteristica
 import laize_tech.back.exceptions.IdNaoEncontradoException
-import laize_tech.back.repository.CategoriaRepository
+import laize_tech.back.repository.CaracteristicaRepository
+import laize_tech.back.repository.ProdutoCaracteristicaRepository
 import laize_tech.back.repository.ProdutoRepository
-import laize_tech.back.service.UploadService
-import org.springframework.http.HttpStatus
+import laize_tech.back.repository.TipoCaracteristicaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("/produtos")
-class ProdutoJpaController(
-    val produtoRepository: ProdutoRepository,
-    val categoriaRepository: CategoriaRepository,
-    private val uploadService: UploadService,
+@RequestMapping("/produto-caracteristica")
+class ProdutoCaracteristicaJpaController(
+    private val repositorio: ProdutoCaracteristicaRepository,
+    private val tipoCaracteristicaRepository: TipoCaracteristicaRepository,
+    private val caracteristicaRepository: CaracteristicaRepository,
+    private val produtoRepository: ProdutoRepository,
 ) {
 
-    @GetMapping("/entradas/mes-atual")
-    fun getEntradasMesAtual(): ResponseEntity<List<Array<Any>>> {
-        val entradas = produtoRepository.getEntradasMesAtual()
-        return if (entradas.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(entradas)
-        }
-    }
-
-    @GetMapping("/vendas/meses")
-    fun getMesAtual(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val meses = produtoRepository.getMesAtual(plataforma)
-        return if (meses.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(meses)
-        }
-    }
-
-    @GetMapping("/vendas/quantidade")
-    fun getQtdProdutoVendido(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val quantidade = produtoRepository.getqtdProdutoVendido(plataforma)
-        return if (quantidade.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(quantidade)
-        }
-    }
-
-    @GetMapping("/vendas/total")
-    fun getTotalVendido(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val totalVendido = produtoRepository.getTotalVendido(plataforma)
-        return if (totalVendido.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(totalVendido)
-        }
-    }
-
-    @GetMapping("/top5")
-    fun getTop5Produtos(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val top5 = produtoRepository.getTop5Produtos(plataforma)
-        return if (top5.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(top5)
-        }
-    }
-
-    @GetMapping("/inativos")
-    fun getProdutosInativos(@RequestParam plataforma: Long): ResponseEntity<List<String>> {
-        val inativos = produtoRepository.getProdutosInativos(plataforma)
-        return if (inativos.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(inativos)
-        }
-    }
-
-    @GetMapping("/receita/mensal")
-    fun getReceitaMensal(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val receita = produtoRepository.getReceitaMensal(plataforma)
-        return if (receita.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(receita)
-        }
-    }
-
     @GetMapping
-    fun get(): ResponseEntity<List<Produto>> {
-        val produtos = produtoRepository.findAll()
+    fun get(): ResponseEntity<List<ProdutoCaracteristica>> {
+        val produtos = repositorio.findAll()
+
         return if (produtos.isEmpty()) {
             ResponseEntity.status(204).build()
         } else {
@@ -101,112 +31,95 @@ class ProdutoJpaController(
         }
     }
 
+    @GetMapping("/caracteristica/{codigo}")
+    fun getProdutoPorCaracteristica(@PathVariable codigo: Int): ResponseEntity<List<ProdutoCaracteristica>> {
+        val produtoCaracteristica = repositorio.findByCaracteristica_IdCaracteristica(codigo)
+
+        if (produtoCaracteristica.isEmpty()) {
+            throw IdNaoEncontradoException("Caracteristica", codigo)
+        }
+
+        return ResponseEntity.status(200).body(produtoCaracteristica)
+    }
+
     @PostMapping
-    fun post(@RequestBody @Valid novoProdutoDTO: ProdutoDTO): ResponseEntity<Produto> {
+    fun post(@RequestBody novoProduto: ProdutoCaracteristicaDTO): ResponseEntity<ProdutoCaracteristica> {
+        val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
+            tipoCaracteristicaRepository.findById(it).orElseThrow {
+                IdNaoEncontradoException("TipoCaracteristica", it)
+            }
+        }
+        val caracteristica = novoProduto.idCaracteristica.let {
+            caracteristicaRepository.findById(it.toInt()).orElseThrow {
+                IdNaoEncontradoException("Caracteristica", it)
+            }
+        }
 
-        val categoria = categoriaRepository.findById(novoProdutoDTO.idCategoria.toInt())
-            .orElseThrow { IdNaoEncontradoException("Categoria", novoProdutoDTO.idCategoria.toInt()) }
+        val produto = novoProduto.idProduto.let {
+            produtoRepository.findById(it.toInt()).orElseThrow {
+                IdNaoEncontradoException("Produto", it)
+            }
+        }
 
-        val novoProduto = Produto(
-            idProduto = 0,
-            categoria = categoria,
-            nomeProduto = novoProdutoDTO.nomeProduto,
-
-            quantidadeProduto = novoProdutoDTO.quantidadeProduto,
-
-            sku = novoProdutoDTO.sku,
-            statusAtivo = novoProdutoDTO.statusAtivo,
-            dtRegistro = TODO(),
-            quantidade = novoProdutoDTO.quantidadeProduto,
+        val produtoCaracteristica = ProdutoCaracteristica(
+            tipoCaracteristica = tipoCaracteristica,
+            caracteristica = caracteristica,
+            produto = produto
         )
 
-        val produtoSalvo = produtoRepository.save(novoProduto)
+        produtoCaracteristica.quantidadeProdutoCaracteristica = novoProduto.quantidadeProduto
 
-        return ResponseEntity.status(201).body(produtoSalvo)
+        return ResponseEntity.status(201).body(repositorio.save(produtoCaracteristica))
     }
 
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long): ResponseEntity<String> {
-        val idInt = id.toInt()
-        if (produtoRepository.existsById(idInt.toLong())) {
-            produtoRepository.deleteById(idInt.toLong())
-            return ResponseEntity.status(204).build()
-        }
-        val mensagem = "Não foi possível deletar o produto com id $id"
-        return ResponseEntity.status(404).body(mensagem)
-    }
+    @PutMapping("/{codigo}")
+    fun put(@PathVariable codigo: Int, @RequestBody novoProduto: ProdutoCaracteristicaDTO): ResponseEntity<ProdutoCaracteristica> {
+        val existente = repositorio.findById(codigo).orElse(null)
+            ?: return ResponseEntity.status(404).build()
 
-    @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody produtoAtualizadoDTO: ProdutoDTO): ResponseEntity<Any> {
-        val produtoExistente = produtoRepository.findById(id.toLong()).orElseThrow {
-            IdNaoEncontradoException("Produto", id)
+        val tipoCaracteristica = novoProduto.idTipoCaracteristica.let {
+            tipoCaracteristicaRepository.findById(it).orElseThrow {
+                IdNaoEncontradoException("TipoCaracteristica", it)
+            }
         }
-
-        if (produtoAtualizadoDTO.nomeProduto.isBlank()) {
-            return ResponseEntity.status(400).body("Nome do produto não pode estar em branco")
+        val caracteristica = novoProduto.idCaracteristica.let {
+            caracteristicaRepository.findById(it.toInt()).orElseThrow {
+                IdNaoEncontradoException("Caracteristica", it)
+            }
         }
-
-        val categoria: Categoria = categoriaRepository.findById(produtoAtualizadoDTO.idCategoria.toInt()).orElseThrow {
-            IdNaoEncontradoException("Categoria", produtoAtualizadoDTO.idCategoria.toInt())
+        val produto = novoProduto.idProduto.let {
+            produtoRepository.findById(it.toInt()).orElseThrow {
+                IdNaoEncontradoException("Produto", it)
+            }
         }
 
-        produtoExistente.categoria = categoria
-        produtoExistente.nomeProduto = produtoAtualizadoDTO.nomeProduto
-        produtoExistente.quantidadeProduto = produtoAtualizadoDTO.quantidadeProduto
-        produtoExistente.statusAtivo = produtoAtualizadoDTO.statusAtivo
+        existente.tipoCaracteristica = tipoCaracteristica
+        existente.caracteristica = caracteristica
+        existente.produto = produto
+        existente.quantidadeProdutoCaracteristica = novoProduto.quantidadeProduto
 
-        val produtoSalvo = produtoRepository.save(produtoExistente)
-        return ResponseEntity.status(200).body(produtoSalvo)
+        return ResponseEntity.status(200).body(repositorio.save(existente))
     }
 
-    @PostMapping("/upload/csv")
-    fun uploadCsv(@RequestParam("file") file: MultipartFile): ResponseEntity<List<Produto>> {
-        if (file.isEmpty) {
-            return ResponseEntity.badRequest().build()
+    @DeleteMapping("/{codigo}")
+    fun delete(@PathVariable codigo: Int): ResponseEntity<Void> {
+        if (!repositorio.existsById(codigo)) {
+            return ResponseEntity.status(404).build()
         }
 
-        if (!file.contentType?.equals("text/csv")!!) {
-            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build()
-        }
-
-        val produtosSalvos = uploadService.uploadFileAndProcess(file)
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtosSalvos)
+        repositorio.deleteById(codigo)
+        return ResponseEntity.status(204).build()
     }
 
- @GetMapping("/dashboard/receita-anual")
-    fun receitaAnual(@RequestParam empresa: Long): ResponseEntity<List<AnoReceitaDTO>> {
-        val raw = produtoRepository.getReceitaAnual(empresa)
-        val dto = raw.map { row ->
-            AnoReceitaDTO((row[0] as Number).toInt(), (row[1] as Number).toBigDecimal())
-        }
-        return ResponseEntity.ok(dto)
+    @PatchMapping("/{codigo}")
+    fun patchQuantidade(@PathVariable codigo: Int, @RequestParam quantidade: Int): ResponseEntity<ProdutoCaracteristica> {
+        val produto = repositorio.findById(codigo).orElse(null)
+            ?: return ResponseEntity.status(404).build()
+
+        produto.quantidadeProdutoCaracteristica = quantidade
+        val produtoAtualizado = repositorio.save(produto)
+
+        return ResponseEntity.status(200).body(produtoAtualizado)
     }
 
-    @GetMapping("/dashboard/valor-por-plataforma")
-    fun valorPorPlataforma(@RequestParam ano: Int): ResponseEntity<List<PlataformaValorDTO>> {
-        val raw = produtoRepository.getValorPorPlataforma(ano)
-        val dto = raw.map { PlataformaValorDTO(rowName(it[0]), (it[1] as Number).toBigDecimal()) }
-        return ResponseEntity.ok(dto)
-    }
-
-    @GetMapping("/dashboard/top5-meses")
-    fun top5Meses(@RequestParam plataforma: Long, @RequestParam ano: Int): ResponseEntity<List<MesQtdDTO>> {
-        val raw = produtoRepository.getTop5Meses(plataforma, ano)
-        val dto = raw.map { MesQtdDTO(it[0] as String, (it[1] as Number).toLong()) }
-        return ResponseEntity.ok(dto)
-    }
-
-    @GetMapping("/dashboard/quantidade-por-plataforma")
-    fun quantidadePorPlataforma(): ResponseEntity<List<PlataformaValorDTO>> {
-        val raw = produtoRepository.getQuantidadePorPlataforma()
-        val dto = raw.map { PlataformaValorDTO(it[0] as String, BigDecimal.valueOf((it[1] as Number).toLong())) }
-        return ResponseEntity.ok(dto)
-    }
-
-    @GetMapping("/dashboard/top5-produtos")
-    fun top5Produtos(@RequestParam plataforma: Long): ResponseEntity<List<ProdutoQtdDTO>> {
-        val raw = produtoRepository.getTop5ProdutosPorPlataforma(plataforma)
-        val dto = raw.map { ProdutoQtdDTO(it[0] as String, (it[1] as Number).toLong()) }
-        return ResponseEntity.ok(dto)
-    }
 }
