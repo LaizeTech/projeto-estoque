@@ -16,7 +16,7 @@ class ArquivoService(
         val url = if (storageService != null) {
             storageService.uploadFile(file)
         } else {
-            "mock-url-${file.originalFilename}" // URL mock para desenvolvimento
+            "mock-url-${file.originalFilename}" 
         }
         
         val arquivo = Arquivo(
