@@ -60,11 +60,9 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     """)
     fun getProdutosInativos(@Param("plataformaId") plataformaId: Long): List<String>
 
-    // CORREÇÃO: Alterado o tipo de retorno para Double?. É mais seguro e correto para um único resultado.
     @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda * i.quantidade) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
     fun getTotalVendido(@Param("plataformaId") plataformaId: Long): Double?
 
-    // CORREÇÃO: Alterado o tipo de retorno para Int?.
     @Query(nativeQuery = true, value = "SELECT SUM(i.quantidade) FROM Itens_Saida i JOIN Saida s ON i.id_saida = s.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
     fun getqtdProdutoVendido(@Param("plataformaId") plataformaId: Long): Int?
 
@@ -88,8 +86,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     ORDER BY ano DESC
 """)
     fun getAnosDisponiveis(): List<Int>
-
-    // 2. Query modificada para receita total por ano
+    
     @Query(nativeQuery = true, value = """
     SELECT SUM(s.preco_venda * i.quantidade) 
     FROM Saida s 
@@ -100,7 +97,6 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
 """)
     fun getTotalVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Double?
 
-    // 3. Query modificada para quantidade de produtos vendidos por ano
     @Query(nativeQuery = true, value = """
     SELECT SUM(i.quantidade) 
     FROM Itens_Saida i 
@@ -111,7 +107,6 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
 """)
     fun getQtdProdutoVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Int?
 
-    // 4. Query modificada para vendas por plataforma por ano
     @Query(nativeQuery = true, value = """
     SELECT 
         pl.nome_plataforma, 
@@ -126,7 +121,6 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
 """)
     fun getVendasPorPlataformaPorAno(@Param("ano") ano: Int): List<Array<Any>>
 
-    // 5. Query modificada para top 5 produtos por ano
     @Query(nativeQuery = true, value = """
     SELECT 
         p.nome_produto, 
@@ -143,7 +137,6 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
 """)
     fun getTop5ProdutosPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
 
-    // 6. Query modificada para receita mensal por ano
     @Query(nativeQuery = true, value = """
     SELECT 
         DATE_FORMAT(s.dt_venda, '%Y-%m') AS mes,
