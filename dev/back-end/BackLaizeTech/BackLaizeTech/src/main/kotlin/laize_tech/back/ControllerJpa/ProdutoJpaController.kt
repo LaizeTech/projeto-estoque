@@ -6,7 +6,6 @@ import laize_tech.back.entity.Categoria
 import laize_tech.back.entity       .Produto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
-// CORREÇÃO: O import do repositório precisa do caminho completo.
 import laize_tech.back.repository.ProdutoRepository
 import laize_tech.back.service.FileUploadService
 import org.springframework.http.HttpStatus
@@ -32,9 +31,7 @@ class ProdutoJpaController(
             ResponseEntity.status(200).body(entradas)
         }
     }
-
-    // CORREÇÃO: Este endpoint chamava "getMesAtual", que não existia.
-    // Alterei para chamar "getReceitaMensal", que parece ser a intenção original.
+    
     @GetMapping("/vendas/meses")
     fun getVendasMeses(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
         val meses = produtoRepository.getReceitaMensal(plataforma)
@@ -66,21 +63,18 @@ class ProdutoJpaController(
             nomeProduto = novoProdutoDTO.nomeProduto,
             quantidadeProduto = novoProdutoDTO.quantidadeProduto,
             statusAtivo = novoProdutoDTO.statusAtivo,
-            // CORREÇÃO: Removido o "dtRegistro = TODO()".
-            // Sua entidade Produto já atribui a data atual por padrão.
         )
         val produtoSalvo = produtoRepository.save(novoProduto)
         return ResponseEntity.status(201).body(produtoSalvo)
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long): ResponseEntity<Void> { // Retornar Void é mais comum para 204
+    fun delete(@PathVariable id: Long): ResponseEntity<Void> { 
         val idInt = id.toInt()
         if (produtoRepository.existsById(idInt)) {
             produtoRepository.deleteById(idInt)
             return ResponseEntity.status(204).build()
         }
-        // Se não existe, lançar a exceção é uma boa prática
         throw IdNaoEncontradoException("Produto", idInt)
     }
 
@@ -91,7 +85,6 @@ class ProdutoJpaController(
         }
 
         if (produtoAtualizadoDTO.nomeProduto.isBlank()) {
-            // Lançar uma exceção é melhor do que retornar ResponseEntity<Any>
             throw IllegalArgumentException("Nome do produto não pode estar em branco")
         }
 
