@@ -42,12 +42,9 @@ class EmpresaJpaController(val repositorio: EmpresaRepository) {
 
     @PostMapping
     fun create(@RequestBody empresa: EmpresaDTO): ResponseEntity<Any> {
-        // Verifica se nomeEmpresa ou cnpj são nulos ou vazios
         if (empresa.nomeEmpresa.isNullOrBlank() || empresa.cnpj.isNullOrBlank()) {
             return ResponseEntity.badRequest().body("Os campos nome e CNPJ não podem estar vazios ou nulos!")
         }
-
-        // Verifica se o CNPJ já está cadastrado
         if (repositorio.existsByCnpj(empresa.cnpj)) {
             return ResponseEntity.status(409).body("Já existe uma empresa cadastrada com esse CNPJ!")
         }
