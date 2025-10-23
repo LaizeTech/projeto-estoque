@@ -33,7 +33,6 @@ class ItensSaidaJpaController(
 
     @PostMapping
     fun post(@RequestBody @Valid novoItem: ItensSaidaDTO): ResponseEntity<ItensSaida> {
-        // Valide e carregue entidades relacionadas
         val tipoCaracteristica = novoItem.idTipoCaracteristica.let {
             tipoCaracteristicaRepository.findById(it).orElseThrow {
                 IdNaoEncontradoException("TipoCaracteristica", it)
@@ -133,61 +132,4 @@ class ItensSaidaJpaController(
         val mensagem = "Não foi possível deletar o item com id $id"
         return ResponseEntity.status(404).body(mensagem)
     }
-
 }
-
-
-
-//    @GetMapping("/por-saida/{idSaida}")
-//    fun getBySaida(@PathVariable idSaida: Int): ResponseEntity<List<ItensSaida>> {
-//        val itens = repositorio.findBySaida_IdSaida(idSaida)
-//
-//        return if (itens.isEmpty()) {
-//            ResponseEntity.status(204).build()
-//        } else {
-//            ResponseEntity.status(200).body(itens)
-//        }
-//    }
-
-//    @GetMapping("/por-produto/{idProduto}")
-//    fun getByProduto(@PathVariable idProduto: Int): ResponseEntity<List<ItensSaida>> {
-//        val itens = repositorio.findByProduto_IdProduto(idProduto)
-//
-//        return if (itens.isEmpty()) {
-//            ResponseEntity.status(204).build()
-//        } else {
-//            ResponseEntity.status(200).body(itens)
-//        }
-//    }
-//
-//    @GetMapping("/por-empresa/{idEmpresa}")
-//    fun getByEmpresa(@PathVariable idEmpresa: Int): ResponseEntity<List<ItensSaida>> {
-//        val itens = repositorio.findByEmpresa_IdEmpresa(idEmpresa)
-//
-//        return if (itens.isEmpty()) {
-//            ResponseEntity.status(204).build()
-//        } else {
-//            ResponseEntity.status(200).body(itens)
-//        }
-//    }
-//
-//    @GetMapping("/por-plataforma/{idPlataforma}")
-//    fun getByPlataforma(@PathVariable idPlataforma: Int): ResponseEntity<List<ItensSaida>> {
-//        val itens = repositorio.findByPlataforma_IdPlataforma(idPlataforma)
-//
-//        return if (itens.isEmpty()) {
-//            ResponseEntity.status(204).build()
-//        } else {
-//            ResponseEntity.status(200).body(itens)
-//        }
-//    }
-//
-//    @GetMapping("/subtotal/{idSaida}")
-//    fun getSubTotalPorSaida(@PathVariable idSaida: Int): ResponseEntity<Double?> {
-//        val subtotal = repositorio.somaSubTotalPorSaida(idSaida)
-//        return if (subtotal == null) {
-//            ResponseEntity.status(204).build()
-//        } else {
-//            ResponseEntity.status(200).body(subtotal)
-//        }
-//    }
