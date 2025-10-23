@@ -55,31 +55,6 @@ class PlataformaJpaController(private val plataformaRepository: PlataformaReposi
         }
     }
 
-//    @PutMapping("/{id}")
-//    fun put(@PathVariable id: Int, @RequestBody @Valid plataformaDTO: PlataformaDTO): ResponseEntity<Any> {
-//        val plataformaExistente = plataformaRepository.findById(id).orElse(null)
-//            ?: return ResponseEntity.status(404).body("Plataforma não encontrada")
-//
-//        if (plataformaDTO.nomePlataforma.isNullOrBlank()) {
-//            return ResponseEntity.status(400).body("Nome da plataforma não pode estar em branco")
-//        }
-//
-//        val empresa = plataformaDTO.idEmpresa?.let { idEmpresa ->
-//            empresaRepository.findById(idEmpresa).orElseThrow {
-//                IllegalArgumentException("Empresa não encontrada com o ID: $idEmpresa")
-//            }
-//        }
-//
-//        plataformaExistente.let {
-//            it.nomePlataforma = plataformaDTO.nomePlataforma
-//            it.status = plataformaDTO.status
-//            it.empresa = empresa
-//        }
-//
-//        val plataformaSalva = plataformaRepository.save(plataformaExistente)
-//        return ResponseEntity.status(200).body(plataformaSalva)
-//    }
-
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody @Valid plataformaDTO: PlataformaDTO): ResponseEntity<Any> {
         val plataformaExistente = plataformaRepository.findById(id).orElseThrow {
