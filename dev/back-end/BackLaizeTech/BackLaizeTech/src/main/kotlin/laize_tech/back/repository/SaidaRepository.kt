@@ -27,7 +27,6 @@ WHERE
     )
     fun calcularRendaBruta7Dias(): BigDecimal?
 
-//Função com CURDATE talvez não funcione já que provavelmente não tem dados no dia, mês ou ano que ele está buscando
     @Query(nativeQuery = true, value = """
         SELECT 
     COUNT(s.id_saida) AS quantidade_venda, 
