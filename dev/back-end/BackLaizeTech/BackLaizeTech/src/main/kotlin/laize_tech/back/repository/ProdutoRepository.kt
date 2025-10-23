@@ -80,4 +80,80 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     ORDER BY total_vendido DESC
 """)
     fun getVendasPorPlataforma(): List<Array<Any>>
+
+    @Query(nativeQuery = true, value = """
+    SELECT DISTINCT YEAR(s.dt_venda) as ano
+    FROM Saida s
+    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    ORDER BY ano DESC
+""")
+    fun getAnosDisponiveis(): List<Int>
+
+    // 2. Query modificada para receita total por ano
+    @Query(nativeQuery = true, value = """
+    SELECT SUM(s.preco_venda * i.quantidade) 
+    FROM Saida s 
+    JOIN Itens_Saida i ON s.id_saida = i.id_saida 
+    WHERE s.id_plataforma = :plataformaId 
+    AND s.id_status_venda = 2
+    AND YEAR(s.dt_venda) = :ano
+""")
+    fun getTotalVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Double?
+
+    // 3. Query modificada para quantidade de produtos vendidos por ano
+    @Query(nativeQuery = true, value = """
+    SELECT SUM(i.quantidade) 
+    FROM Itens_Saida i 
+    JOIN Saida s ON i.id_saida = s.id_saida 
+    WHERE s.id_plataforma = :plataformaId 
+    AND s.id_status_venda = 2
+    AND YEAR(s.dt_venda) = :ano
+""")
+    fun getQtdProdutoVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Int?
+
+    // 4. Query modificada para vendas por plataforma por ano
+    @Query(nativeQuery = true, value = """
+    SELECT 
+        pl.nome_plataforma, 
+        SUM(i.quantidade) AS total_vendido
+    FROM Plataforma pl
+    JOIN Saida s ON pl.id_plataforma = s.id_plataforma
+    JOIN Itens_Saida i ON s.id_saida = i.id_saida
+    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    AND YEAR(s.dt_venda) = :ano
+    GROUP BY pl.nome_plataforma
+    ORDER BY total_vendido DESC
+""")
+    fun getVendasPorPlataformaPorAno(@Param("ano") ano: Int): List<Array<Any>>
+
+    // 5. Query modificada para top 5 produtos por ano
+    @Query(nativeQuery = true, value = """
+    SELECT 
+        p.nome_produto, 
+        SUM(i.quantidade) AS total_vendido
+    FROM Produto p
+    JOIN Itens_Saida i ON p.id_produto = i.id_produto
+    JOIN Saida s ON i.id_saida = s.id_saida
+    WHERE s.id_plataforma = :plataformaId 
+    AND s.id_status_venda = 2
+    AND YEAR(s.dt_venda) = :ano
+    GROUP BY p.nome_produto
+    ORDER BY total_vendido DESC
+    LIMIT 5
+""")
+    fun getTop5ProdutosPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
+
+    // 6. Query modificada para receita mensal por ano
+    @Query(nativeQuery = true, value = """
+    SELECT 
+        DATE_FORMAT(s.dt_venda, '%Y-%m') AS mes,
+        SUM(s.preco_venda * i.quantidade) AS receita
+    FROM Saida s
+    JOIN Itens_Saida i ON s.id_saida = i.id_saida
+    WHERE s.id_plataforma = :plataformaId
+    AND YEAR(s.dt_venda) = :ano
+    GROUP BY mes
+    ORDER BY mes ASC
+""")
+    fun getReceitaMensalPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
 }

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/produtos")
+@CrossOrigin("http://localhost:3000")
 class ProdutoJpaController(
     val produtoRepository: ProdutoRepository,
     val categoriaRepository: CategoriaRepository,
@@ -41,68 +42,6 @@ class ProdutoJpaController(
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(meses)
-        }
-    }
-
-    // CORREÇÃO: Lógica ajustada para o novo tipo de retorno (Int?).
-    @GetMapping("/vendas/quantidade")
-    fun getQtdProdutoVendido(@RequestParam plataforma: Long): ResponseEntity<Int> {
-        val quantidade = produtoRepository.getqtdProdutoVendido(plataforma)
-        return if (quantidade != null) {
-            ResponseEntity.status(200).body(quantidade)
-        } else {
-            ResponseEntity.status(204).build()
-        }
-    }
-
-    @GetMapping("/vendas/por-plataforma")
-    fun getVendasPorPlataforma(): ResponseEntity<List<Array<Any>>> {
-        val vendas = produtoRepository.getVendasPorPlataforma()
-        return if (vendas.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(vendas)
-        }
-    }
-
-    // CORREÇÃO: Lógica ajustada para o novo tipo de retorno (Double?).
-    @GetMapping("/vendas/total")
-    fun getTotalVendido(@RequestParam plataforma: Long): ResponseEntity<Double> {
-        val totalVendido = produtoRepository.getTotalVendido(plataforma)
-        return if (totalVendido != null) {
-            ResponseEntity.status(200).body(totalVendido)
-        } else {
-            ResponseEntity.status(204).build()
-        }
-    }
-
-    @GetMapping("/top5")
-    fun getTop5Produtos(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val top5 = produtoRepository.getTop5Produtos(plataforma)
-        return if (top5.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(top5)
-        }
-    }
-
-    @GetMapping("/inativos")
-    fun getProdutosInativos(@RequestParam plataforma: Long): ResponseEntity<List<String>> {
-        val inativos = produtoRepository.getProdutosInativos(plataforma)
-        return if (inativos.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(inativos)
-        }
-    }
-
-    @GetMapping("/receita/mensal")
-    fun getReceitaMensal(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
-        val receita = produtoRepository.getReceitaMensal(plataforma)
-        return if (receita.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(receita)
         }
     }
 
@@ -183,5 +122,102 @@ class ProdutoJpaController(
 
         val produtosSalvos = uploadService.uploadFileAndProcess(file)
         return ResponseEntity.status(HttpStatus.CREATED).body(produtosSalvos)
+    }
+
+    @GetMapping("/anos-disponiveis")
+    fun getAnosDisponiveis(): ResponseEntity<List<Int>> {
+        val anos = produtoRepository.getAnosDisponiveis()
+        return if (anos.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(anos)
+        }
+    }
+
+    @GetMapping("/vendas/total")
+    fun getTotalVendido(
+        @RequestParam plataforma: Long,
+        @RequestParam(required = false) ano: Int?
+    ): ResponseEntity<Double> {
+        val totalVendido = if (ano != null) {
+            produtoRepository.getTotalVendidoPorAno(plataforma, ano)
+        } else {
+            produtoRepository.getTotalVendido(plataforma)
+        }
+
+        return if (totalVendido != null) {
+            ResponseEntity.status(200).body(totalVendido)
+        } else {
+            ResponseEntity.status(204).build()
+        }
+    }
+
+    @GetMapping("/vendas/quantidade")
+    fun getQtdProdutoVendido(
+        @RequestParam plataforma: Long,
+        @RequestParam(required = false) ano: Int?
+    ): ResponseEntity<Int> {
+        val quantidade = if (ano != null) {
+            produtoRepository.getQtdProdutoVendidoPorAno(plataforma, ano)
+        } else {
+            produtoRepository.getqtdProdutoVendido(plataforma)
+        }
+
+        return if (quantidade != null) {
+            ResponseEntity.status(200).body(quantidade)
+        } else {
+            ResponseEntity.status(204).build()
+        }
+    }
+
+    @GetMapping("/vendas/por-plataforma")
+    fun getVendasPorPlataforma(@RequestParam(required = false) ano: Int?): ResponseEntity<List<Array<Any>>> {
+        val vendas = if (ano != null) {
+            produtoRepository.getVendasPorPlataformaPorAno(ano)
+        } else {
+            produtoRepository.getVendasPorPlataforma()
+        }
+
+        return if (vendas.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(vendas)
+        }
+    }
+
+    @GetMapping("/top5")
+    fun getTop5Produtos(
+        @RequestParam plataforma: Long,
+        @RequestParam(required = false) ano: Int?
+    ): ResponseEntity<List<Array<Any>>> {
+        val top5 = if (ano != null) {
+            produtoRepository.getTop5ProdutosPorAno(plataforma, ano)
+        } else {
+            produtoRepository.getTop5Produtos(plataforma)
+        }
+
+        return if (top5.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(top5)
+        }
+    }
+
+    @GetMapping("/receita/mensal")
+    fun getReceitaMensal(
+        @RequestParam plataforma: Long,
+        @RequestParam(required = false) ano: Int?
+    ): ResponseEntity<List<Array<Any>>> {
+        val receita = if (ano != null) {
+            produtoRepository.getReceitaMensalPorAno(plataforma, ano)
+        } else {
+            produtoRepository.getReceitaMensal(plataforma)
+        }
+
+        return if (receita.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(receita)
+        }
     }
 }
