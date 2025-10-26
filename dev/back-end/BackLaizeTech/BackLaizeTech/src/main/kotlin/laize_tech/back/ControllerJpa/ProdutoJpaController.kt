@@ -8,7 +8,9 @@ import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
 import laize_tech.back.repository.ProdutoRepository
 import laize_tech.back.service.FileUploadService
+import laize_tech.back.service.ProdutoService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -20,7 +22,17 @@ class ProdutoJpaController(
     val produtoRepository: ProdutoRepository,
     val categoriaRepository: CategoriaRepository,
     private val uploadService: FileUploadService,
+    private val produtoService: ProdutoService,
 ) {
+
+    @PostMapping(value = ["/cadastro"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun cadastrarProduto(
+        @RequestPart("produto") produtoDTO: ProdutoDTO,
+        @RequestPart("imagem", required = false) imagem: MultipartFile?
+    ): ResponseEntity<ProdutoDTO> {
+        val novoProduto = produtoService.cadastrarProduto(produtoDTO, imagem)
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto)
+    }
 
     @GetMapping("/entradas/mes-atual")
     fun getEntradasMesAtual(): ResponseEntity<List<Array<Any>>> {
