@@ -1,13 +1,17 @@
 package laize_tech.back.repository
 
+import laize_tech.back.dto.PlataformaDetalhe
 import laize_tech.back.entity.Produto
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ProdutoRepository : JpaRepository<Produto, Int> {
+
+    fun findAllByStatusAtivoTrue(): List<Produto>
 
     @Query(nativeQuery = true, value = """
         SELECT 
@@ -19,6 +23,21 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
         GROUP BY mes
     """)
     fun getEntradasMesAtual(): List<Array<Any>>
+
+    @Query(value = """
+        SELECT DISTINCT
+            pp.id_plataforma AS fkPlataforma,
+            p.nome_plataforma AS nomePlataforma
+        FROM Plataforma_Produto pp
+        JOIN Plataforma p ON pp.id_plataforma = p.id_plataforma
+        WHERE pp.id_produto = :idProduto
+    """, nativeQuery = true)
+    fun findPlataformasByProdutoId(idProduto: Int): List<PlataformaDetalhe>
+
+    // NOVO MÉTODO: Inativação Lógica
+    @Modifying
+    @Query("UPDATE Produto p SET p.statusAtivo = false WHERE p.idProduto = :idProduto")
+    fun inativarProduto(@Param("idProduto") idProduto: Int): Int
 
     @Query(nativeQuery = true, value = """
         SELECT 
