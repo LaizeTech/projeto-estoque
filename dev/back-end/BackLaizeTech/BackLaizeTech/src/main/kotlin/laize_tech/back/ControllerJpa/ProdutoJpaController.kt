@@ -26,9 +26,16 @@ class ProdutoJpaController(
 ) {
 
     @GetMapping
-    fun get(): ResponseEntity<List<ProdutoDetalheDTO>> {
-        // ALTERAÇÃO: Busca apenas produtos com statusAtivo = true
-        val produtos = produtoRepository.findAllByStatusAtivoTrue()
+    fun get(
+        @RequestParam(required = false) categorias: List<Int>?
+    ): ResponseEntity<List<ProdutoDetalheDTO>> {
+        // Busca apenas produtos com statusAtivo = true
+        val produtos = if (categorias.isNullOrEmpty()) {
+            produtoRepository.findAllByStatusAtivoTrue()
+        } else {
+            // Busca produtos ativos que pertencem a alguma das categorias fornecidas
+            produtoRepository.findAllByStatusAtivoTrueAndCategoria_IdCategoriaIn(categorias)
+        }
 
         if (produtos.isEmpty()) {
             return ResponseEntity.status(204).build()

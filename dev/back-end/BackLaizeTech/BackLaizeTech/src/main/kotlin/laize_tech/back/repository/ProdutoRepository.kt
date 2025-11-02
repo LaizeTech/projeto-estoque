@@ -105,7 +105,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     ORDER BY ano DESC
 """)
     fun getAnosDisponiveis(): List<Int>
-    
+
     @Query(nativeQuery = true, value = """
     SELECT SUM(s.preco_venda * i.quantidade) 
     FROM Saida s 
@@ -155,6 +155,8 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     LIMIT 5
 """)
     fun getTop5ProdutosPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
+
+    fun findAllByStatusAtivoTrueAndCategoria_IdCategoriaIn(categoriaIds: List<Int>): List<Produto>
 
     @Query(nativeQuery = true, value = """
     SELECT 
