@@ -63,6 +63,25 @@ class ProdutoJpaController(
         return ResponseEntity.ok(produtoAtualizado)
     }
 
+    @DeleteMapping("/{idProduto}/plataformas/{idPlataforma}" )
+    fun removerPlataforma(
+        @PathVariable idProduto: Int,
+        @PathVariable idPlataforma: Int
+    ): ResponseEntity<Void> {
+        produtoService.removerPlataforma(idProduto, idPlataforma)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
+
+    @PostMapping("/{idProduto}/plataformas")
+    fun adicionarNovaPlataforma(
+        @PathVariable idProduto: Int,
+        @RequestBody dto: AdicionarPlataformaDTO
+    ): ResponseEntity<Void> {
+        produtoService.adicionarNovaPlataforma(idProduto, dto)
+        return ResponseEntity.status(HttpStatus.CREATED).build()
+    }
+
+
     @PatchMapping("/{id}/inativar")
     fun inativarProduto(@PathVariable id: Int): ResponseEntity<Void> {
         val sucesso = produtoService.inativarProduto(id)
@@ -74,6 +93,16 @@ class ProdutoJpaController(
             // Se o produto não for encontrado, lança a exceção (ou retorna 404)
             throw IdNaoEncontradoException("Produto", id)
         }
+    }
+
+    @PutMapping(value = ["/{id}/atualizar"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun atualizarProdutoComImagem(
+        @PathVariable id: Int,
+        @RequestPart("produto") produtoDTO: ProdutoEdicaoDTO, // Usando o novo DTO
+        @RequestPart("imagem", required = false) imagem: MultipartFile?
+    ): ResponseEntity<ProdutoDTO> {
+        val produtoAtualizado = produtoService.atualizarProduto(id, produtoDTO, imagem)
+        return ResponseEntity.ok(produtoAtualizado)
     }
 
     @PostMapping(value = ["/cadastro"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
