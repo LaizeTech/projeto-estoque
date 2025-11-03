@@ -8,5 +8,12 @@ data class ProdutoDTO(
     val quantidadeProduto: Int,
     val precoProduto: BigDecimal,
     val statusAtivo: Boolean,
-    var caminhoImagem: String?
+    var caminhoImagem: String?,
+
+    // Adicionado para a requisição (entrada)
+    val plataformas: List<PlataformaRequestDTO>? = null,
+
+    // Adicionado para a resposta (saída)
+    val idProduto: Int? = null,
+    val plataformasDetalhe: List<PlataformaDetalheDTO>? = null
 )

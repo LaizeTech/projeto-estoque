@@ -4,6 +4,8 @@ import laize_tech.back.dto.ProdutoDTO
 import laize_tech.back.dto.AdicionarQtdRequestDTO
 import laize_tech.back.dto.ProdutoEdicaoDTO
 import laize_tech.back.dto.AdicionarPlataformaDTO
+import laize_tech.back.dto.PlataformaDetalheDTO // DTO de resposta
+import laize_tech.back.dto.PlataformaRequestDTO // DTO de requisição
 import laize_tech.back.entity.Produto
 import laize_tech.back.entity.PlataformaProduto
 import laize_tech.back.repository.CategoriaRepository
@@ -21,8 +23,8 @@ class ProdutoService(
     private val produtoRepository: ProdutoRepository,
     private val categoriaRepository: CategoriaRepository,
     private val imageStorageService: ImageStorageService,
-    private val plataformaProdutoRepository: PlataformaProdutoRepository, // INJEÇÃO CORRIGIDA
-    private val plataformaRepository: PlataformaRepository // INJEÇÃO NECESSÁRIA
+    private val plataformaProdutoRepository: PlataformaProdutoRepository,
+    private val plataformaRepository: PlataformaRepository
 ) {
 
     @Transactional
@@ -41,15 +43,45 @@ class ProdutoService(
             dtRegistro = LocalDateTime.now()
         )
 
-        val salvo = produtoRepository.save(produto)
+        val produtoSalvo = produtoRepository.save(produto)
 
+        // 1. SALVAR AS PLATAFORMAS NA TABELA DE RELACIONAMENTO
+        val plataformasDetalhe = mutableListOf<PlataformaDetalheDTO>()
+
+        // Agora o ProdutoDTO tem o campo 'plataformas' (Lista de PlataformaRequestDTO)
+        produtoDTO.plataformas?.forEach { plataformaReq ->
+            // Assumindo que você adicionou findByNomePlataforma no PlataformaRepository
+            val plataforma = plataformaRepository.findByNomePlataforma(plataformaReq.name)
+                ?: throw IllegalArgumentException("Plataforma não encontrada pelo nome: ${plataformaReq.name}")
+
+            val novaRelacao = PlataformaProduto(
+                plataforma = plataforma,
+                produto = produtoSalvo,
+                quantidadeProdutoPlataforma = plataformaReq.quantity
+            )
+
+            plataformaProdutoRepository.save(novaRelacao)
+
+            // Adiciona ao DTO de retorno
+            plataformasDetalhe.add(
+                PlataformaDetalheDTO(
+                    fkPlataforma = plataforma.idPlataforma ?: 0,
+                    nomePlataforma = plataforma.nomePlataforma ?: "Nome desconhecido"
+                )
+            )
+        }
+
+        // 2. RETORNAR O DTO COMPLETO COM AS PLATAFORMAS
+        // Agora o ProdutoDTO tem os campos idProduto e plataformasDetalhe
         return ProdutoDTO(
-            idCategoria = salvo.categoria?.idCategoria ?: 0,
-            nomeProduto = salvo.nomeProduto ?: "",
-            quantidadeProduto = salvo.quantidadeProduto,
+            idProduto = produtoSalvo.idProduto,
+            idCategoria = produtoSalvo.categoria?.idCategoria ?: 0,
+            nomeProduto = produtoSalvo.nomeProduto ?: "",
+            quantidadeProduto = produtoSalvo.quantidadeProduto,
             precoProduto = produtoDTO.precoProduto,
-            statusAtivo = salvo.statusAtivo,
-            caminhoImagem = salvo.caminhoImagem
+            statusAtivo = produtoSalvo.statusAtivo,
+            caminhoImagem = produtoSalvo.caminhoImagem,
+            plataformasDetalhe = plataformasDetalhe
         )
     }
 
@@ -71,6 +103,7 @@ class ProdutoService(
 
         val produtoSalvo = produtoRepository.save(produto)
 
+        // Retorna o DTO de edição (mantendo a funcionalidade original)
         return ProdutoDTO(
             idCategoria = produtoSalvo.categoria?.idCategoria ?: 0,
             nomeProduto = produtoSalvo.nomeProduto ?: "",
@@ -117,7 +150,6 @@ class ProdutoService(
             throw IllegalArgumentException("O produto já está associado a esta plataforma.")
         }
 
-        // CORREÇÃO: Instanciando PlataformaProduto corretamente
         val novaRelacao = PlataformaProduto(
             plataforma = plataforma,
             produto = produto,

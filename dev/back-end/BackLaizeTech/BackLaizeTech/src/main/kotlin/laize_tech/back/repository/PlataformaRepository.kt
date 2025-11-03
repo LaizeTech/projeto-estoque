@@ -12,5 +12,5 @@ interface PlataformaRepository : JpaRepository<Plataforma, Int> {
     @Modifying
     @Query("select e from Plataforma e") //JPQL --> NÃO é SQL.
     fun findAllPlataformas(): List<Plataforma>
-
+    fun findByNomePlataforma(nomePlataforma: String): Plataforma?
 }
