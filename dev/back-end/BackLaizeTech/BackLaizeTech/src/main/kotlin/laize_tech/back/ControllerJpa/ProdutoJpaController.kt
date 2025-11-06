@@ -3,7 +3,7 @@ package laize_tech.back.ControllerJpa
 import jakarta.validation.Valid
 import laize_tech.back.dto.*
 import laize_tech.back.entity.Categoria
-import laize_tech.back.entity.Produto
+import laize_tech.back.entity       .Produto
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.CategoriaRepository
 import laize_tech.back.repository.ProdutoRepository
@@ -25,93 +25,6 @@ class ProdutoJpaController(
     private val produtoService: ProdutoService,
 ) {
 
-    @GetMapping
-    fun get(
-        @RequestParam(required = false) categorias: List<Int>?
-    ): ResponseEntity<List<ProdutoDetalheDTO>> {
-        // Busca apenas produtos com statusAtivo = true
-        val produtos = if (categorias.isNullOrEmpty()) {
-            produtoRepository.findAllByStatusAtivoTrue()
-        } else {
-            // Busca produtos ativos que pertencem a alguma das categorias fornecidas
-            produtoRepository.findAllByStatusAtivoTrueAndCategoria_IdCategoriaIn(categorias)
-        }
-
-        if (produtos.isEmpty()) {
-            return ResponseEntity.status(204).build()
-        }
-
-        val produtosComDetalhes = produtos.map { produto ->
-            // 1. Buscar as plataformas de venda
-            val plataformasDetalhe = produtoRepository.findPlataformasByProdutoId(produto.idProduto).map {
-                PlataformaDetalheDTO(
-                    fkPlataforma = it.getFkPlataforma(),
-                    nomePlataforma = it.getNomePlataforma()
-                )
-            }
-
-            // 2. Mapear para o DTO de retorno (ProdutoDetalheDTO)
-            ProdutoDetalheDTO.fromProduto(
-                produto = produto,
-                plataformas = plataformasDetalhe,
-                preco = null // Ajuste aqui se o preço for necessário
-            )
-        }
-
-        return ResponseEntity.status(200).body(produtosComDetalhes)
-    }
-
-    // Endpoint para adicionar quantidade por plataforma (JÁ IMPLEMENTADO)
-    @PatchMapping("/adicionar-quantidade")
-    fun adicionarQuantidadePorPlataforma(
-        @RequestBody dto: AdicionarQtdRequestDTO
-    ): ResponseEntity<Produto> {
-        val produtoAtualizado = produtoService.adicionarQuantidadePorPlataforma(dto)
-        return ResponseEntity.ok(produtoAtualizado)
-    }
-
-    @DeleteMapping("/{idProduto}/plataformas/{idPlataforma}" )
-    fun removerPlataforma(
-        @PathVariable idProduto: Int,
-        @PathVariable idPlataforma: Int
-    ): ResponseEntity<Void> {
-        produtoService.removerPlataforma(idProduto, idPlataforma)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-    }
-
-    @PostMapping("/{idProduto}/plataformas")
-    fun adicionarNovaPlataforma(
-        @PathVariable idProduto: Int,
-        @RequestBody dto: AdicionarPlataformaDTO
-    ): ResponseEntity<Void> {
-        produtoService.adicionarNovaPlataforma(idProduto, dto)
-        return ResponseEntity.status(HttpStatus.CREATED).build()
-    }
-
-
-    @PatchMapping("/{id}/inativar")
-    fun inativarProduto(@PathVariable id: Int): ResponseEntity<Void> {
-        val sucesso = produtoService.inativarProduto(id)
-
-        return if (sucesso) {
-            // Retorna 204 No Content para indicar sucesso sem corpo de resposta
-            ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        } else {
-            // Se o produto não for encontrado, lança a exceção (ou retorna 404)
-            throw IdNaoEncontradoException("Produto", id)
-        }
-    }
-
-    @PutMapping(value = ["/{id}/atualizar"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun atualizarProdutoComImagem(
-        @PathVariable id: Int,
-        @RequestPart("produto") produtoDTO: ProdutoEdicaoDTO, // Usando o novo DTO
-        @RequestPart("imagem", required = false) imagem: MultipartFile?
-    ): ResponseEntity<ProdutoDTO> {
-        val produtoAtualizado = produtoService.atualizarProduto(id, produtoDTO, imagem)
-        return ResponseEntity.ok(produtoAtualizado)
-    }
-
     @PostMapping(value = ["/cadastro"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun cadastrarProduto(
         @RequestPart("produto") produtoDTO: ProdutoDTO,
@@ -131,22 +44,6 @@ class ProdutoJpaController(
         }
     }
 
-    @PatchMapping("/{id}/quantidade")
-    fun adicionarQuantidade(
-        @PathVariable id: Int,
-        @RequestBody dto: ProdutoQtdDTO
-    ): ResponseEntity<Produto> {
-
-        val produto = produtoRepository.findById(id)
-            .orElseThrow { IdNaoEncontradoException("Produto", id) }
-
-        produto.quantidadeProduto += dto.qtd.toInt()
-
-        produtoRepository.save(produto)
-
-        return ResponseEntity.ok(produto)
-    }
-
     @GetMapping("/vendas/meses")
     fun getVendasMeses(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
         val meses = produtoRepository.getReceitaMensal(plataforma)
@@ -154,6 +51,16 @@ class ProdutoJpaController(
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(meses)
+        }
+    }
+
+    @GetMapping
+    fun get(): ResponseEntity<List<Produto>> {
+        val produtos = produtoRepository.findAll()
+        return if (produtos.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(produtos)
         }
     }
 
@@ -234,13 +141,21 @@ class ProdutoJpaController(
 
     @GetMapping("/vendas/total")
     fun getTotalVendido(
-        @RequestParam plataforma: Long,
+        @RequestParam(required = false) plataforma: Long?,
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<Double> {
-        val totalVendido = if (ano != null) {
+        val totalVendido = if (ano != null && plataforma == null) {
+            // Busca anual GERAL (para tela de métricas anuais)
+            produtoRepository.getTotalVendidoPorAnoGeral(ano)
+        } else if (ano != null && plataforma != null) {
+            // Busca por ano e plataforma
             produtoRepository.getTotalVendidoPorAno(plataforma, ano)
-        } else {
+        } else if (plataforma != null) {
+            // Busca total por plataforma (sem ano)
             produtoRepository.getTotalVendido(plataforma)
+        } else {
+            // Se não tiver nenhum parâmetro válido
+            return ResponseEntity.badRequest().build()
         }
 
         return if (totalVendido != null) {
@@ -285,13 +200,21 @@ class ProdutoJpaController(
 
     @GetMapping("/top5")
     fun getTop5Produtos(
-        @RequestParam plataforma: Long,
+        @RequestParam(required = false) plataforma: Long?,
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<List<Array<Any>>> {
-        val top5 = if (ano != null) {
+        val top5 = if (ano != null && plataforma == null) {
+            // Busca anual GERAL (para tela de métricas anuais)
+            produtoRepository.getTop5ProdutosPorAnoGeral(ano)
+        } else if (ano != null && plataforma != null) {
+            // Busca por ano e plataforma
             produtoRepository.getTop5ProdutosPorAno(plataforma, ano)
-        } else {
+        } else if (plataforma != null) {
+            // Busca top 5 por plataforma (sem ano)
             produtoRepository.getTop5Produtos(plataforma)
+        } else {
+            // Se não tiver nenhum parâmetro válido
+            return ResponseEntity.badRequest().build()
         }
 
         return if (top5.isEmpty()) {
@@ -303,13 +226,21 @@ class ProdutoJpaController(
 
     @GetMapping("/receita/mensal")
     fun getReceitaMensal(
-        @RequestParam plataforma: Long,
+        @RequestParam(required = false) plataforma: Long?,
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<List<Array<Any>>> {
-        val receita = if (ano != null) {
+        val receita = if (ano != null && plataforma == null) {
+            // Busca anual GERAL (para tela de métricas anuais), retorna mês abreviado
+            produtoRepository.getReceitaMensalPorAnoGeral(ano)
+        } else if (ano != null && plataforma != null) {
+            // Busca por ano e plataforma
             produtoRepository.getReceitaMensalPorAno(plataforma, ano)
-        } else {
+        } else if (plataforma != null) {
+            // Busca mensal por plataforma (6 meses)
             produtoRepository.getReceitaMensal(plataforma)
+        } else {
+            // Se não tiver nenhum parâmetro válido
+            return ResponseEntity.badRequest().build()
         }
 
         return if (receita.isEmpty()) {
