@@ -6,6 +6,7 @@ import laize_tech.back.entity.Usuario
 import laize_tech.back.exceptions.IdNaoEncontradoException
 import laize_tech.back.repository.EmpresaRepository
 import laize_tech.back.repository.UsuarioRepository
+import laize_tech.back.dto.BuscarFuncDTO
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

@@ -44,6 +44,16 @@ class ProdutoJpaController(
         }
     }
 
+    @GetMapping("/inativos")
+    fun getProdutosInativos(@RequestParam plataforma: Long): ResponseEntity<List<String>> {
+        val inativos = produtoRepository.getProdutosInativos(plataforma)
+        return if (inativos.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(inativos)
+        }
+    }
+
     @GetMapping("/vendas/meses")
     fun getVendasMeses(@RequestParam plataforma: Long): ResponseEntity<List<Array<Any>>> {
         val meses = produtoRepository.getReceitaMensal(plataforma)

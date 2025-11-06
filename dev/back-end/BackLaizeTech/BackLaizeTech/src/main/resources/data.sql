@@ -1,1 +1,1 @@
-INSERT INTO empresa (nome_empresa, cnpj) VALUES ('Nome da Empresa', '12345678901234');
+-- INSERT INTO empresa (nome_empresa, cnpj) VALUES ('Nome da Empresa', '12345678901234');
