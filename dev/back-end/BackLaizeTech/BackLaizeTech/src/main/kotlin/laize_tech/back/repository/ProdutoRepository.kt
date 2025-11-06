@@ -110,21 +110,19 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     SELECT SUM(s.preco_venda * i.quantidade) 
     FROM Saida s 
     JOIN Itens_Saida i ON s.id_saida = i.id_saida 
-    WHERE s.id_plataforma = :plataformaId 
     AND s.id_status_venda = 2
     AND YEAR(s.dt_venda) = :ano
 """)
-    fun getTotalVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Double?
+    fun getTotalVendidoPorAno(@Param("ano") ano: Int): Double?
 
     @Query(nativeQuery = true, value = """
     SELECT SUM(i.quantidade) 
     FROM Itens_Saida i 
     JOIN Saida s ON i.id_saida = s.id_saida 
-    WHERE s.id_plataforma = :plataformaId 
-    AND s.id_status_venda = 2
+    WHERE s.id_status_venda = 2
     AND YEAR(s.dt_venda) = :ano
 """)
-    fun getQtdProdutoVendidoPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): Int?
+    fun getQtdProdutoVendidoPorAno(@Param("ano") ano: Int): Int?
 
     @Query(nativeQuery = true, value = """
     SELECT 
@@ -147,14 +145,13 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     FROM Produto p
     JOIN Itens_Saida i ON p.id_produto = i.id_produto
     JOIN Saida s ON i.id_saida = s.id_saida
-    WHERE s.id_plataforma = :plataformaId 
-    AND s.id_status_venda = 2
+    WHERE s.id_status_venda = 2
     AND YEAR(s.dt_venda) = :ano
     GROUP BY p.nome_produto
     ORDER BY total_vendido DESC
     LIMIT 5
 """)
-    fun getTop5ProdutosPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
+    fun getTop5ProdutosPorAno(@Param("ano") ano: Int): List<Array<Any>>
 
     fun findAllByStatusAtivoTrueAndCategoria_IdCategoriaIn(categoriaIds: List<Int>): List<Produto>
 
@@ -164,10 +161,9 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
         SUM(s.preco_venda * i.quantidade) AS receita
     FROM Saida s
     JOIN Itens_Saida i ON s.id_saida = i.id_saida
-    WHERE s.id_plataforma = :plataformaId
-    AND YEAR(s.dt_venda) = :ano
+    WHERE YEAR(s.dt_venda) = :ano
     GROUP BY mes
     ORDER BY mes ASC
 """)
-    fun getReceitaMensalPorAno(@Param("plataformaId") plataformaId: Long, @Param("ano") ano: Int): List<Array<Any>>
+    fun getReceitaMensalPorAno(@Param("ano") ano: Int): List<Array<Any>>
 }

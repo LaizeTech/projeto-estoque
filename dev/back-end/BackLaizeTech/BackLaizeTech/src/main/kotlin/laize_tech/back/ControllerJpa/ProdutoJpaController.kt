@@ -247,7 +247,7 @@ class ProdutoJpaController(
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<Double> {
         val totalVendido = if (ano != null) {
-            produtoRepository.getTotalVendidoPorAno(plataforma, ano)
+            produtoRepository.getTotalVendidoPorAno(ano)
         } else {
             produtoRepository.getTotalVendido(plataforma)
         }
@@ -262,10 +262,10 @@ class ProdutoJpaController(
     @GetMapping("/vendas/quantidade")
     fun getQtdProdutoVendido(
         @RequestParam plataforma: Long,
-        @RequestParam(required = false) ano: Int?
+        @RequestParam(required = false) ano: Int
     ): ResponseEntity<Int> {
         val quantidade = if (ano != null) {
-            produtoRepository.getQtdProdutoVendidoPorAno(plataforma, ano)
+            produtoRepository.getQtdProdutoVendidoPorAno(ano)
         } else {
             produtoRepository.getqtdProdutoVendido(plataforma)
         }
@@ -298,7 +298,7 @@ class ProdutoJpaController(
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<List<Array<Any>>> {
         val top5 = if (ano != null) {
-            produtoRepository.getTop5ProdutosPorAno(plataforma, ano)
+            produtoRepository.getTop5ProdutosPorAno(ano)
         } else {
             produtoRepository.getTop5Produtos(plataforma)
         }
@@ -316,7 +316,7 @@ class ProdutoJpaController(
         @RequestParam(required = false) ano: Int?
     ): ResponseEntity<List<Array<Any>>> {
         val receita = if (ano != null) {
-            produtoRepository.getReceitaMensalPorAno(plataforma, ano)
+            produtoRepository.getReceitaMensalPorAno(ano)
         } else {
             produtoRepository.getReceitaMensal(plataforma)
         }
