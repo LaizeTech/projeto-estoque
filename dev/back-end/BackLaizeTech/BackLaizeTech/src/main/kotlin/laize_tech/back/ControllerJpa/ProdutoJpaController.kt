@@ -88,6 +88,15 @@ class ProdutoJpaController(
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
+    @GetMapping("/inativos")
+    fun getProdutosInativos(@RequestParam plataforma: Long): ResponseEntity<List<String>> {
+        val inativos = produtoRepository.getProdutosInativos(plataforma)
+        return if (inativos.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(inativos)
+        }
+    }
 
     @PatchMapping("/{id}/inativar")
     fun inativarProduto(@PathVariable id: Int): ResponseEntity<Void> {
