@@ -59,7 +59,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
         FROM Produto p
         JOIN Itens_Saida i ON p.id_produto = i.id_produto
         JOIN Saida s ON i.id_saida = s.id_saida
-        WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2 -- FINALIZADA
+        WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1 -- FINALIZADA
         GROUP BY p.nome_produto
         ORDER BY total_vendido DESC
         LIMIT 5
@@ -79,10 +79,10 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     """)
     fun getProdutosInativos(@Param("plataformaId") plataformaId: Long): List<String>
 
-    @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda * i.quantidade) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
+    @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda * i.quantidade) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1")
     fun getTotalVendido(@Param("plataformaId") plataformaId: Long): Double?
 
-    @Query(nativeQuery = true, value = "SELECT SUM(i.quantidade) FROM Itens_Saida i JOIN Saida s ON i.id_saida = s.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 2")
+    @Query(nativeQuery = true, value = "SELECT SUM(i.quantidade) FROM Itens_Saida i JOIN Saida s ON i.id_saida = s.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1")
     fun getqtdProdutoVendido(@Param("plataformaId") plataformaId: Long): Int?
 
     @Query(nativeQuery = true, value = """
@@ -92,7 +92,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     FROM Plataforma pl
     JOIN Saida s ON pl.id_plataforma = s.id_plataforma
     JOIN Itens_Saida i ON s.id_saida = i.id_saida
-    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
     GROUP BY pl.nome_plataforma
     ORDER BY total_vendido DESC
 """)
@@ -101,7 +101,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query(nativeQuery = true, value = """
     SELECT DISTINCT YEAR(s.dt_venda) as ano
     FROM Saida s
-    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
     ORDER BY ano DESC
 """)
     fun getAnosDisponiveis(): List<Int>
@@ -110,7 +110,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     SELECT SUM(s.preco_venda * i.quantidade) 
     FROM Saida s 
     JOIN Itens_Saida i ON s.id_saida = i.id_saida 
-    AND s.id_status_venda = 2
+    AND s.id_status_venda = 1
     AND YEAR(s.dt_venda) = :ano
 """)
     fun getTotalVendidoPorAno(@Param("ano") ano: Int): Double?
@@ -119,7 +119,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     SELECT SUM(i.quantidade) 
     FROM Itens_Saida i 
     JOIN Saida s ON i.id_saida = s.id_saida 
-    WHERE s.id_status_venda = 2
+    WHERE s.id_status_venda = 1
     AND YEAR(s.dt_venda) = :ano
 """)
     fun getQtdProdutoVendidoPorAno(@Param("ano") ano: Int): Int?
@@ -131,7 +131,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     FROM Plataforma pl
     JOIN Saida s ON pl.id_plataforma = s.id_plataforma
     JOIN Itens_Saida i ON s.id_saida = i.id_saida
-    WHERE s.id_status_venda = 2 -- Apenas vendas FINALIZADAS
+    WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
     AND YEAR(s.dt_venda) = :ano
     GROUP BY pl.nome_plataforma
     ORDER BY total_vendido DESC
@@ -145,7 +145,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     FROM Produto p
     JOIN Itens_Saida i ON p.id_produto = i.id_produto
     JOIN Saida s ON i.id_saida = s.id_saida
-    WHERE s.id_status_venda = 2
+    WHERE s.id_status_venda = 1
     AND YEAR(s.dt_venda) = :ano
     GROUP BY p.nome_produto
     ORDER BY total_vendido DESC
