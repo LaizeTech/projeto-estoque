@@ -168,13 +168,13 @@ class SaidaJpaController(
         val listaDetalhada = resultados.map { row ->
             mapOf(
                 "id_saida" to row[0],
-                "nome_produto" to row[1],
-                "quantidade" to row[2],
-                "plataforma" to row[3],
-                "data_venda" to row[4],
-                "status_produto" to if ((row[5] as? Number)?.toInt() == 1) "ATIVO" else "DESATIVO",
-                "preco_venda" to row[6],
-                "fornecedor" to row[7]
+                "nome_plataforma" to row[1],
+                "nome_tipo" to row[2],
+                "data_venda" to row[3],
+                "preco_venda" to row[4],
+                "total_desconto" to row[5],
+                "nome_status" to row[6],
+//                "fornecedor" to row[7]
             )
         }
         return ResponseEntity.ok(listaDetalhada)
