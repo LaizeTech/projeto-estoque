@@ -42,9 +42,8 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query(nativeQuery = true, value = """
         SELECT 
             DATE_FORMAT(s.dt_venda, '%Y-%m') AS mes,
-            SUM(s.preco_venda * i.quantidade) AS receita
+            SUM(s.preco_venda) AS receita
         FROM Saida s
-        JOIN Itens_Saida i ON s.id_saida = i.id_saida
         WHERE s.id_plataforma = :plataformaId
         AND s.dt_venda >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
         GROUP BY mes
@@ -91,7 +90,6 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
         SUM(i.quantidade) AS total_vendido
     FROM Plataforma pl
     JOIN Saida s ON pl.id_plataforma = s.id_plataforma
-    JOIN Itens_Saida i ON s.id_saida = i.id_saida
     WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
     GROUP BY pl.nome_plataforma
     ORDER BY total_vendido DESC
@@ -107,10 +105,9 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     fun getAnosDisponiveis(): List<Int>
 
     @Query(nativeQuery = true, value = """
-    SELECT SUM(s.preco_venda * i.quantidade) 
+    SELECT SUM(s.preco_venda) 
     FROM Saida s 
-    JOIN Itens_Saida i ON s.id_saida = i.id_saida 
-    AND s.id_status_venda = 1
+    WHERE s.id_status_venda = 1
     AND YEAR(s.dt_venda) = :ano
 """)
     fun getTotalVendidoPorAno(@Param("ano") ano: Int): Double?
@@ -127,10 +124,9 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query(nativeQuery = true, value = """
     SELECT 
         pl.nome_plataforma, 
-        SUM(i.quantidade) AS total_vendido
+        SUM(s.id_saida) AS total_vendido
     FROM Plataforma pl
     JOIN Saida s ON pl.id_plataforma = s.id_plataforma
-    JOIN Itens_Saida i ON s.id_saida = i.id_saida
     WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
     AND YEAR(s.dt_venda) = :ano
     GROUP BY pl.nome_plataforma
@@ -158,9 +154,8 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query(nativeQuery = true, value = """
     SELECT 
         DATE_FORMAT(s.dt_venda, '%Y-%m') AS mes,
-        SUM(s.preco_venda * i.quantidade) AS receita
+        SUM(s.preco_venda) AS receita
     FROM Saida s
-    JOIN Itens_Saida i ON s.id_saida = i.id_saida
     WHERE YEAR(s.dt_venda) = :ano
     GROUP BY mes
     ORDER BY mes ASC
