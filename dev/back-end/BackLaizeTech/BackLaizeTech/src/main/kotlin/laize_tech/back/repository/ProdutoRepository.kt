@@ -78,7 +78,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     """)
     fun getProdutosInativos(@Param("plataformaId") plataformaId: Long): List<String>
 
-    @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda * i.quantidade) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1")
+    @Query(nativeQuery = true, value = "SELECT SUM(s.preco_venda) FROM Saida s JOIN Itens_Saida i ON s.id_saida = i.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1")
     fun getTotalVendido(@Param("plataformaId") plataformaId: Long): Double?
 
     @Query(nativeQuery = true, value = "SELECT SUM(i.quantidade) FROM Itens_Saida i JOIN Saida s ON i.id_saida = s.id_saida WHERE s.id_plataforma = :plataformaId AND s.id_status_venda = 1")
@@ -87,7 +87,7 @@ interface ProdutoRepository : JpaRepository<Produto, Int> {
     @Query(nativeQuery = true, value = """
     SELECT 
         pl.nome_plataforma, 
-        SUM(i.quantidade) AS total_vendido
+        SUM(s.preco_venda) AS total_vendido
     FROM Plataforma pl
     JOIN Saida s ON pl.id_plataforma = s.id_plataforma
     WHERE s.id_status_venda = 1 -- Apenas vendas FINALIZADAS
