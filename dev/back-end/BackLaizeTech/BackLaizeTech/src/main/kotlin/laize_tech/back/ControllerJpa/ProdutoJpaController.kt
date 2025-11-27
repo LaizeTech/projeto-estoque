@@ -29,11 +29,9 @@ class ProdutoJpaController(
     fun get(
         @RequestParam(required = false) categorias: List<Int>?
     ): ResponseEntity<List<ProdutoDetalheDTO>> {
-        // Busca apenas produtos com statusAtivo = true
         val produtos = if (categorias.isNullOrEmpty()) {
             produtoRepository.findAllByStatusAtivoTrue()
         } else {
-            // Busca produtos ativos que pertencem a alguma das categorias fornecidas
             produtoRepository.findAllByStatusAtivoTrueAndCategoria_IdCategoriaIn(categorias)
         }
 
@@ -42,7 +40,6 @@ class ProdutoJpaController(
         }
 
         val produtosComDetalhes = produtos.map { produto ->
-            // 1. Buscar as plataformas de venda
             val plataformasDetalhe = produtoRepository.findPlataformasByProdutoId(produto.idProduto).map {
                 PlataformaDetalheDTO(
                     fkPlataforma = it.getFkPlataforma(),
@@ -50,15 +47,34 @@ class ProdutoJpaController(
                 )
             }
 
-            // 2. Mapear para o DTO de retorno (ProdutoDetalheDTO)
+            val caminhoImagem = produto.caminhoImagem?.let {
+                "http://localhost:8080/uploads/imagens/$it"
+            }
+
             ProdutoDetalheDTO.fromProduto(
                 produto = produto,
                 plataformas = plataformasDetalhe,
-                preco = null // Ajuste aqui se o preço for necessário
+                preco = null,
+                caminhoImagem = caminhoImagem // URL completa
             )
         }
 
         return ResponseEntity.status(200).body(produtosComDetalhes)
+    }
+
+    // NOVO ENDPOINT: Para suportar a lógica de fallback do frontend
+    @GetMapping("/{id}/imagePath")
+    fun getImagePath(@PathVariable id: Int): ResponseEntity<Map<String, String>> {
+        val produto = produtoRepository.findById(id)
+            .orElseThrow { IdNaoEncontradoException("Produto", id) }
+
+        val caminhoImagem = produto.caminhoImagem ?: ""
+
+        return if (caminhoImagem.isBlank()) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        } else {
+            ResponseEntity.ok(mapOf("caminhoImagem" to caminhoImagem))
+        }
     }
 
     // Endpoint para adicionar quantidade por plataforma (JÁ IMPLEMENTADO)
