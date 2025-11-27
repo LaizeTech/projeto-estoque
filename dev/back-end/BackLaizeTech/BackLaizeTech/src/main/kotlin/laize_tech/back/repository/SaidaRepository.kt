@@ -52,24 +52,43 @@ GROUP BY p.nome_plataforma;
 
 
     @Query(nativeQuery = true, value = """
-        SELECT
+        SELECT 
             s.id_saida,
-            p.nome_produto,
-            i.quantidade,
             pl.nome_plataforma,
-            s.dt_venda,
-            p.status_ativo,
+            ts.nome_tipo,
+            DATE(s.dt_venda) as dt_venda,
             s.preco_venda,
-            cp.fornecedor
+            s.total_desconto,
+            ss.nome_status
         FROM Saida s
-        JOIN Itens_Saida i ON s.id_saida = i.id_saida
-        JOIN Produto p ON i.id_produto = p.id_produto
         JOIN Plataforma pl ON s.id_plataforma = pl.id_plataforma
-        JOIN Status_Venda sv ON s.id_status_venda = sv.id_status_venda
-        LEFT JOIN Compra_Produto cp ON cp.id_produto = p.id_produto
-        WHERE sv.nome_status = 'FINALIZADA'
-        GROUP BY s.id_saida, p.nome_produto, i.quantidade, pl.nome_plataforma, s.dt_venda, p.status_ativo, s.preco_venda, cp.fornecedor
-        ORDER BY s.dt_venda DESC
+        JOIN Tipo_Saida ts ON s.id_tipo_saida = ts.id_tipo_saida
+        JOIN Status_Venda ss ON s.id_status_venda = ss.id_status_venda
+        ORDER BY s.dt_venda;
     """)
     fun findSaidasDetalhes(): List<Array<Any>>
+
+    @Query(nativeQuery = true, value = """
+        SELECT 
+            p.nome_produto AS nomeProduto,
+            its.quantidade AS quantidade,
+            c.nome_caracteristica AS nomeCaracteristica,
+            tc.nome_tipo_caracteristica AS nomeTipoCaracteristica,
+            pl.nome_plataforma AS nomePlataforma
+        FROM Itens_Saida its
+        JOIN Produto p ON its.id_produto = p.id_produto
+        JOIN Plataforma pl ON its.id_plataforma = pl.id_plataforma
+        LEFT JOIN Caracteristica c ON its.id_caracteristica = c.id_caracteristica
+        LEFT JOIN Tipo_Caracteristica tc ON its.id_tipo_caracteristica = tc.id_tipo_caracteristica
+        WHERE its.id_saida = :idSaida
+    """)
+    fun findDetalhesPorSaidaId(idSaida: Int): List<ItemSaidaDetalheProjection>
+}
+
+interface ItemSaidaDetalheProjection {
+    fun getNomeProduto(): String
+    fun getQuantidade(): Int
+    fun getNomeCaracteristica(): String?
+    fun getNomeTipoCaracteristica(): String?
+    fun getNomePlataforma(): String
 }

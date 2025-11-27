@@ -206,7 +206,7 @@ class UsuarioJpaController(
     @GetMapping("/{id}")
     fun get(@PathVariable id: Int): ResponseEntity<Any> {
         val usuario = repositorio.findById(id)
-        return if (usuario.isPresent) {
+        return if (usuario.isEmpty) {
             val usuarioEncontrado = usuario.get()
             val listagemUsuario = ListagemUsuarioDTO(
                 nome = usuarioEncontrado.nome,
