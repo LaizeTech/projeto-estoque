@@ -14,7 +14,12 @@ data class ProdutoDetalheDTO(
     val plataformas: List<PlataformaDetalheDTO>
 ) {
     companion object {
-        fun fromProduto(produto: Produto, plataformas: List<PlataformaDetalheDTO>, preco: Double? = null): ProdutoDetalheDTO {
+        fun fromProduto(
+            produto: Produto,
+            plataformas: List<PlataformaDetalheDTO>,
+            preco: Double? = null,
+            caminhoImagem: String?
+        ): ProdutoDetalheDTO {
             return ProdutoDetalheDTO(
                 idProduto = produto.idProduto,
                 nomeProduto = produto.nomeProduto ?: "",
