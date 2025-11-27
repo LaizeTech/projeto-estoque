@@ -67,7 +67,7 @@ class EmpresaJpaController(val repositorio: EmpresaRepository) {
     @PutMapping("/{id}")
     fun update(@PathVariable id: Int, @RequestBody empresaAtualizada: Empresa): ResponseEntity<Empresa> {
         val existente = repositorio.findById(id)
-        return if (existente.isPresent) {
+        return if (existente.isEmpty) {
             val empresa = existente.get().copy(
                 nomeEmpresa = empresaAtualizada.nomeEmpresa,
                 cnpj = empresaAtualizada.cnpj

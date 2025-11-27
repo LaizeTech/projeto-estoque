@@ -180,4 +180,25 @@ class SaidaJpaController(
         return ResponseEntity.ok(listaDetalhada)
     }
 
+    @GetMapping("/{id}/itens")
+    fun getItensPorSaida(@PathVariable id: Int): ResponseEntity<Any> {
+        val itens = repositorio.findDetalhesPorSaidaId(id)
+
+        if (itens.isEmpty()) {
+            return ResponseEntity.status(204).build()
+        }
+
+        val resposta = itens.map { item ->
+            mapOf(
+                "nome_produto" to item.getNomeProduto(),
+                "quantidade" to item.getQuantidade(),
+                "nome_caracteristica" to item.getNomeCaracteristica(),
+                "nome_tipo_caracteristica" to item.getNomeTipoCaracteristica(),
+                "nome_plataforma" to item.getNomePlataforma()
+            )
+        }
+
+        return ResponseEntity.ok(resposta)
+    }
+
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 
 @Entity
+@Table(name = "Itens_Saida")
 class ItensSaida(
 
     @Id
@@ -26,6 +27,7 @@ class ItensSaida(
 
     @field:Positive
     @NotNull
+    @Column(name = "quantidade")
     var quantidade: Int? = null,
 
     @ManyToOne
@@ -45,5 +47,6 @@ class ItensSaida(
     @NotNull
     var produto: Produto? = null
 ) {
+    // Construtor padrão exigido pelo JPA
     constructor() : this(null, null, null, null, null, null, null, null)
 }

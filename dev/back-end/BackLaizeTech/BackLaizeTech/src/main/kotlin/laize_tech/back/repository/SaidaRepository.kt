@@ -67,4 +67,28 @@ GROUP BY p.nome_plataforma;
         ORDER BY s.dt_venda;
     """)
     fun findSaidasDetalhes(): List<Array<Any>>
+
+    @Query(nativeQuery = true, value = """
+        SELECT 
+            p.nome_produto AS nomeProduto,
+            its.quantidade AS quantidade,
+            c.nome_caracteristica AS nomeCaracteristica,
+            tc.nome_tipo_caracteristica AS nomeTipoCaracteristica,
+            pl.nome_plataforma AS nomePlataforma
+        FROM Itens_Saida its
+        JOIN Produto p ON its.id_produto = p.id_produto
+        JOIN Plataforma pl ON its.id_plataforma = pl.id_plataforma
+        LEFT JOIN Caracteristica c ON its.id_caracteristica = c.id_caracteristica
+        LEFT JOIN Tipo_Caracteristica tc ON its.id_tipo_caracteristica = tc.id_tipo_caracteristica
+        WHERE its.id_saida = :idSaida
+    """)
+    fun findDetalhesPorSaidaId(idSaida: Int): List<ItemSaidaDetalheProjection>
+}
+
+interface ItemSaidaDetalheProjection {
+    fun getNomeProduto(): String
+    fun getQuantidade(): Int
+    fun getNomeCaracteristica(): String?
+    fun getNomeTipoCaracteristica(): String?
+    fun getNomePlataforma(): String
 }
