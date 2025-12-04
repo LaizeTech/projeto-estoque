@@ -10,15 +10,17 @@ data class ProdutoDetalheDTO(
     val statusAtivo: Int,
     val idCategoria: Int,
     val nomeCategoria: String?,
-    val precoProduto: Double?, // Incluindo o preço, caso o back-end o retorne
-    val plataformas: List<PlataformaDetalheDTO>
+    val precoProduto: Double?,
+    val plataformas: List<PlataformaDetalheDTO>,
+    // 1. CAMPO ADICIONADO AO CONSTRUTOR PRINCIPAL
+    val caminhoImagem: String?
 ) {
     companion object {
         fun fromProduto(
             produto: Produto,
             plataformas: List<PlataformaDetalheDTO>,
-            preco: Double? = null,
-            caminhoImagem: String?
+            preco: Double? = null
+            // O parâmetro 'caminhoImagem' FOI REMOVIDO daqui
         ): ProdutoDetalheDTO {
             return ProdutoDetalheDTO(
                 idProduto = produto.idProduto,
@@ -28,7 +30,9 @@ data class ProdutoDetalheDTO(
                 idCategoria = produto.categoria?.idCategoria ?: 0,
                 nomeCategoria = produto.categoria?.nomeCategoria,
                 precoProduto = preco,
-                plataformas = plataformas
+                plataformas = plataformas,
+                // 2. CAMPO POPULADO DIRETAMENTE DA ENTIDADE 'produto'
+                caminhoImagem = produto.caminhoImagem
             )
         }
     }

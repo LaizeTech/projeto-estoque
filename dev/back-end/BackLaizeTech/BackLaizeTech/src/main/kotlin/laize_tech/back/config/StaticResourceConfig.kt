@@ -13,12 +13,15 @@ class StaticResourceConfig : WebMvcConfigurer {
     private lateinit var uploadDir: String
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        val resolvedPath = Paths.get(uploadDir).toAbsolutePath()
-        val resourceLocation = "file:" + resolvedPath.toString() + "/"
+        // 1. Resolve o caminho absoluto e garante que ele termine com uma barra.
+        // O .toUri().toString() garante o formato correto para o Spring Boot.
+        val absolutePathUri = Paths.get(uploadDir).toAbsolutePath().toUri().toString()
 
-        println("Servindo arquivos estáticos de: $resourceLocation") // Log para depuração
-
+        // 2. Mapeia a URL /uploads/imagens/** para o caminho absoluto
         registry.addResourceHandler("/uploads/imagens/**")
-            .addResourceLocations(resourceLocation)
+            .addResourceLocations(absolutePathUri)
+
+        // Log para verificação
+        println("DEBUG: Mapeamento de Recursos Estáticos: /uploads/imagens/** -> $absolutePathUri")
     }
 }

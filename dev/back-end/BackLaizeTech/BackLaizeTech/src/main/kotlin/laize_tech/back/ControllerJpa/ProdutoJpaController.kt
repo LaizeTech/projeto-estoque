@@ -54,8 +54,7 @@ class ProdutoJpaController(
             ProdutoDetalheDTO.fromProduto(
                 produto = produto,
                 plataformas = plataformasDetalhe,
-                preco = null,
-                caminhoImagem = caminhoImagem // URL completa
+                preco = null
             )
         }
 
