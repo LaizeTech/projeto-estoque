@@ -21,6 +21,9 @@ class ImageStorageService(
         val nomeArquivo = "${UUID.randomUUID()}_${file.originalFilename}"
         val caminho: Path = Paths.get(uploadDir).resolve(nomeArquivo)
 
+        // NOVO LOG DE VERIFICAÇÃO - Adicione esta linha
+        println("DEBUG: Caminho Absoluto de Salvamento: ${caminho.toAbsolutePath()}")
+
         Files.createDirectories(caminho.parent)
         Files.copy(file.inputStream, caminho, StandardCopyOption.REPLACE_EXISTING)
 
